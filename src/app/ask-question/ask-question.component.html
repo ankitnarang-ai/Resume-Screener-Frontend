@@ -1,0 +1,27 @@
+<div class="card">
+  <div class="card-header">
+    <h5>Resume Matching Analysis</h5>
+  </div>
+  <div class="card-body">
+    <textarea 
+      class="question-input" 
+      [(ngModel)]="question" 
+      placeholder="Paste job description here..."
+      rows="5"
+    ></textarea>
+    
+    @if (isLoading) {
+      <button class="btn btn-success" disabled>
+        <span class="spinner"></span> Analyzing Resumes...
+      </button>
+    } @else {
+      <button class="btn btn-success" (click)="askQuestion()">
+        Analyze Against Resumes
+      </button>
+    }
+    
+    @if (answer) {
+      <div class="answer-container" [innerHTML]="answer"></div>
+    }
+  </div>
+</div>

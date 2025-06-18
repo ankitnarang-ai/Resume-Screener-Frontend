@@ -1,0 +1,75 @@
+@import '../../styles';
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  max-width: 800px;
+  margin: 20px auto;
+  
+  &-header {
+    padding: 16px;
+    background: #3f51b5;
+    color: white;
+    font-weight: 600;
+  }
+  
+  &-body {
+    padding: 20px;
+  }
+}
+
+.question-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 150px;
+  font-size: 16px;
+}
+
+.btn {
+  padding: 10px 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  margin-bottom: 20px;
+  
+  &:disabled {
+    opacity: 0.7;
+  }
+}
+
+.answer-container {
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  border-left: 4px solid #3f51b5;
+  
+  h3 {
+    color: #3f51b5;
+    margin-top: 0;
+  }
+  
+  strong {
+    color: #333;
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 5px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

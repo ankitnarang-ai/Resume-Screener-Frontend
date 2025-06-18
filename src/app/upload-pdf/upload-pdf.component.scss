@@ -1,0 +1,95 @@
+@import '../../styles';
+
+.card {
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  overflow: hidden;
+  
+  &-header {
+    padding: $spacing-md;
+    background: $light-gray;
+    border-bottom: 1px solid $border-color;
+    
+    h5 {
+      margin: 0;
+      color: $dark;
+    }
+  }
+  
+  &-body {
+    padding: $spacing-md;
+  }
+}
+
+.file-input {
+  width: 100%;
+  padding: $spacing-sm;
+  margin-bottom: $spacing-md;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+}
+
+.btn {
+  padding: $spacing-sm $spacing-md;
+  border-radius: $border-radius;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  &-primary {
+    background: $primary;
+    color: white;
+    
+    &:hover {
+      background: darken($primary, 10%);
+    }
+    
+    &:disabled {
+      background: lighten($primary, 20%);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: $spacing-xs;
+}
+
+.alert {
+  padding: $spacing-sm;
+  margin-top: $spacing-md;
+  background: $info-bg;
+  color: $info-text;
+  border-radius: $border-radius;
+}
+
+.file-list {
+  margin-top: $spacing-md;
+  
+  h6 {
+    margin-bottom: $spacing-sm;
+    color: $dark;
+  }
+  
+  ul {
+    padding-left: $spacing-md;
+    margin: 0;
+    
+    li {
+      margin-bottom: $spacing-xs;
+    }
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

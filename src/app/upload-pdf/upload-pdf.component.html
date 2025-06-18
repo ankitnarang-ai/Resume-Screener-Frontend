@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-header">
+    <h5>Upload PDF Files</h5>
+  </div>
+  <div class="card-body">
+    <input type="file" class="file-input" multiple accept=".pdf" (change)="onFileSelect($event)">
+    
+    @if (isLoading) {
+      <button class="btn btn-primary" disabled>
+        <span class="spinner"></span> Processing...
+      </button>
+    } @else {
+      <button class="btn btn-primary" (click)="uploadFiles()">
+        Upload and Process
+      </button>
+    }
+    
+    @if (uploadStatus) {
+      <div class="alert">{{ uploadStatus }}</div>
+    }
+    
+    @if (selectedFiles.length > 0) {
+      <div class="file-list">
+        <h6>Selected Files:</h6>
+        <ul>
+          @for (file of selectedFiles; track file.name) {
+            <li>{{ file.name }} ({{ file.size }})</li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</div>

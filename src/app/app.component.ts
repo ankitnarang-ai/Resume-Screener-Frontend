@@ -1,13 +1,12 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { UploadPdfComponent } from './upload-pdf/upload-pdf.component';
+import { AskQuestionComponent } from './ask-question/ask-question.component';
 
 @Component({
-  selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  styleUrl: './app.component.scss',
+  imports: [UploadPdfComponent, AskQuestionComponent]
 })
-export class AppComponent {
-  title = 'resume-parser';
-}
+export class AppComponent {}
