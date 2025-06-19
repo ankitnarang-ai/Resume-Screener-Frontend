@@ -1,32 +1,61 @@
-<div class="card">
-  <div class="card-header">
-    <h5>Upload PDF Files</h5>
+<div class="upload-section">
+  <div class="upload-header">
+    <h3>Upload Documents</h3>
   </div>
-  <div class="card-body">
-    <input type="file" class="file-input" multiple accept=".pdf" (change)="onFileSelect($event)">
+  
+  <div class="upload-content">
+    <!-- File Drop Zone -->
+    <div class="file-drop-zone" (click)="triggerFileInput()">
+      <span class="icon">📄</span>
+      <div class="text">Drop PDF files here</div>
+      <div class="subtext">or click to browse</div>
+      <input 
+        #fileInput
+        type="file" 
+        multiple 
+        accept=".pdf" 
+        (change)="onFileSelect($event)"
+      >
+    </div>
     
-    @if (isLoading) {
-      <button class="btn btn-primary" disabled>
-        <span class="spinner"></span> Processing...
-      </button>
-    } @else {
-      <button class="btn btn-primary" (click)="uploadFiles()">
-        Upload and Process
-      </button>
-    }
-    
-    @if (uploadStatus) {
-      <div class="alert">{{ uploadStatus }}</div>
-    }
-    
+    <!-- Selected Files -->
     @if (selectedFiles.length > 0) {
-      <div class="file-list">
-        <h6>Selected Files:</h6>
-        <ul>
+      <div class="selected-files">
+        <div class="files-header">Selected Files</div>
+        <div class="file-list">
           @for (file of selectedFiles; track file.name) {
-            <li>{{ file.name }} ({{ file.size }})</li>
+            <div class="file-item">
+              <span class="file-icon">📄</span>
+              <span class="file-name">{{ file.name }}</span>
+              <span class="file-size">{{ formatFileSize(file.size) }}</span>
+            </div>
           }
-        </ul>
+        </div>
+      </div>
+    }
+    
+    <!-- Upload Button -->
+    <button 
+      class="btn btn-primary upload-button"
+      (click)="uploadFiles()"
+      [disabled]="selectedFiles.length === 0 || isLoading"
+    >
+      @if (isLoading) {
+        <span class="spinner"></span>
+        Processing...
+      } @else {
+        Upload Files
+      }
+    </button>
+    
+    <!-- Status -->
+    @if (uploadStatus) {
+      <div 
+        class="upload-status"
+        [class.success]="uploadStatus.includes('Success')"
+        [class.error]="uploadStatus.includes('Error')"
+      >
+        {{ uploadStatus }}
       </div>
     }
   </div>

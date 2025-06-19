@@ -1,11 +1,22 @@
-<div class="container">
-  <h1 class="title">PDF RAG System</h1>
-  
-  <div class="row">
-    <div class="col">
-      <app-upload-pdf></app-upload-pdf>
+<div class="app-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      📄 Resume Analyzer
     </div>
-    <div class="col">
+    <app-upload-pdf></app-upload-pdf>
+  </div>
+  
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="chat-header">
+      <h1>Resume Analysis</h1>
+      <p>Upload PDFs and ask questions about the candidates</p>
+    </div>
+    
+    <!-- Chat Area -->
+    <div class="chat-container">
       <app-ask-question></app-ask-question>
     </div>
   </div>
