@@ -73,7 +73,7 @@ export class AskQuestionComponent implements AfterViewChecked {
     this.isLoading = true;
     this.shouldScrollToBottom = true;
 
-    this.http.post('http://localhost:8000/ask', { question })
+    this.http.post('https://resume-screener-backend-zelt.onrender.com/ask', { question })
       .subscribe({
         next: (response: any) => {
           const assistantMessage: Message = {

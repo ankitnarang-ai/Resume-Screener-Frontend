@@ -42,7 +42,7 @@ export class UploadPdfComponent {
       formData.append('files', file);
     }
 
-    this.http.post('http://localhost:8000/upload-and-process/', formData)
+    this.http.post('https://resume-screener-backend-zelt.onrender.com/upload-and-process/', formData)
       .subscribe({
         next: (response: any) => {
           this.uploadStatus = `Success! Processed ${this.selectedFiles.length} files.`;
