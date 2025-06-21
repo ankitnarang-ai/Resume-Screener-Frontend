@@ -1,23 +1,7 @@
+<!-- app.component.html -->
 <div class="app-container">
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="logo">
-      📄 Resume Analyzer
-    </div>
-    <app-upload-pdf></app-upload-pdf>
-  </div>
-  
-  <!-- Main Content -->
-  <div class="main-content">
-    <!-- Header -->
-    <div class="chat-header">
-      <h1>Resume Analysis</h1>
-      <p>Upload PDFs and ask questions about the candidates</p>
-    </div>
-    
-    <!-- Chat Area -->
-    <div class="chat-container">
-      <app-ask-question></app-ask-question>
-    </div>
-  </div>
+  <app-navbar></app-navbar>
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
 </div>

@@ -1,12 +1,15 @@
+// app.component.ts
 import { Component } from '@angular/core';
-import { UploadPdfComponent } from './upload-pdf/upload-pdf.component';
-import { AskQuestionComponent } from './ask-question/ask-question.component';
+import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './components/navbar/navbar/navbar.component';
 
 @Component({
   standalone: true,
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
-  imports: [UploadPdfComponent, AskQuestionComponent]
+  styleUrls: ['./app.component.scss'],
+  imports: [RouterOutlet, NavbarComponent]
 })
-export class AppComponent {}
+export class AppComponent {
+  title = 'Resume Analyzer';
+}

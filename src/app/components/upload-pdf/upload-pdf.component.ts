@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -17,7 +18,7 @@ export class UploadPdfComponent {
   uploadStatus = '';
   isLoading = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   triggerFileInput() {
     this.fileInput.nativeElement.click();
@@ -47,6 +48,8 @@ export class UploadPdfComponent {
         next: (response: any) => {
           this.uploadStatus = `Success! Processed ${this.selectedFiles.length} files.`;
           this.isLoading = false;
+          // Navigate to chat after successful upload
+          this.router.navigate(['/chat']);
         },
         error: (error) => {
           console.error('Upload error:', error);
