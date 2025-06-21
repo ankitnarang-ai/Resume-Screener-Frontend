@@ -1,0 +1,59 @@
+<div class="upload-wrapper">
+  <div class="upload-box">
+    <h2>Upload Resumes</h2>
+    <p class="subtitle">AI-powered resume analysis</p>
+
+    <div class="drop-area" 
+         (click)="fileInput.click()"
+         [class.active]="isDragging">
+      <div class="upload-icon-container">
+        <mat-icon class="upload-icon">cloud_upload</mat-icon>
+      </div>
+      <p>Drag & drop PDF files here</p>
+      <small>or click to browse</small>
+      <input #fileInput type="file" hidden multiple accept=".pdf" (change)="onFileSelect($event)">
+    </div>
+
+    @if (selectedFiles.length > 0) {
+      <div class="files-list">
+        <div class="files-header">
+          <span>Selected files ({{ selectedFiles.length }})</span>
+          <button (click)="clearFiles()">Clear All</button>
+        </div>
+        
+        <div class="files-container">
+          @for (file of selectedFiles; track file.name; let i = $index) {
+            <div class="file-item">
+              <mat-icon>description</mat-icon>
+              <div class="file-info">
+                <span class="file-name">{{ file.name }}</span>
+                <span class="file-size">{{ formatFileSize(file.size) }}</span>
+              </div>
+              <button class="remove-btn" (click)="removeFile(i)" title="Remove file">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="action-area">
+      <button class="upload-btn" 
+              (click)="uploadFiles()"
+              [disabled]="!selectedFiles.length || isLoading">
+        @if (isLoading) {
+          <span class="spinner"></span>
+        }
+        Analyze Resumes
+      </button>
+
+      @if (uploadStatus) {
+        <div class="status-message" [class.success]="uploadStatus.includes('Success')">
+          <mat-icon>{{ uploadStatus.includes('Success') ? 'check_circle' : 'error' }}</mat-icon>
+          {{ uploadStatus }}
+        </div>
+      }
+    </div>
+  </div>
+</div>

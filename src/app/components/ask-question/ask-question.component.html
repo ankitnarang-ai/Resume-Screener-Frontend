@@ -1,0 +1,77 @@
+<div class="chat-interface">
+  <!-- Header -->
+  <div class="chat-header">
+    <h2>Resume Analysis</h2>
+    <p class="subtitle">Ask questions about your uploaded resumes</p>
+  </div>
+
+  <!-- Chat Messages (scrollable) -->
+  <div class="chat-messages">
+    <!-- Suggestions (show when no messages) -->
+    @if (messages.length === 0) {
+      <div class="suggestions">
+        <h3>Try asking:</h3>
+        <div class="suggestion-grid">
+          @for (suggestion of suggestionQuestions; track suggestion) {
+            <div class="suggestion-card" (click)="useSuggestion(suggestion)">
+              {{ suggestion }}
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Messages -->
+    @for (message of messages; track message.id) {
+      <div class="message" [class]="message.role">
+        <div class="avatar">
+          @if (message.role === 'user') {
+            <mat-icon>person</mat-icon>
+          } @else {
+            <mat-icon>smart_toy</mat-icon>
+          }
+        </div>
+        <div class="content" [innerHTML]="message.content"></div>
+      </div>
+    }
+
+    <!-- Loading indicator -->
+    @if (isLoading) {
+      <div class="message assistant">
+        <div class="avatar">
+          <mat-icon>smart_toy</mat-icon>
+        </div>
+        <div class="content">
+          <div class="typing">
+            Analyzing
+            <span class="dot">.</span>
+            <span class="dot">.</span>
+            <span class="dot">.</span>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Input Area (fixed at bottom) -->
+  <div class="chat-input">
+    <textarea
+      [(ngModel)]="currentMessage"
+      placeholder="Ask about the candidates..."
+      (keydown.enter)="sendMessage()"
+      #messageInput
+      rows="1"
+    ></textarea>
+    <button 
+      class="send-btn"
+      (click)="sendMessage()"
+      [disabled]="!currentMessage.trim() || isLoading"
+    >
+      @if (isLoading) {
+        <mat-icon class="spinner">autorenew</mat-icon>
+      } @else {
+        <mat-icon>send</mat-icon>
+      }
+    </button>
+  </div>
+</div>

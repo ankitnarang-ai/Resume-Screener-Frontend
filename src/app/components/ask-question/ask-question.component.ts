@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef, AfterViewChecked } from '@angular/cor
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 
 interface Message {
   id: string;
@@ -15,7 +16,8 @@ interface Message {
   selector: 'app-ask-question',
   templateUrl: './ask-question.component.html',
   styleUrls: ['./ask-question.component.scss'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, MatIconModule
+  ],
 })
 export class AskQuestionComponent implements AfterViewChecked {
   @ViewChild('messageInput') messageInput!: ElementRef<HTMLTextAreaElement>;
