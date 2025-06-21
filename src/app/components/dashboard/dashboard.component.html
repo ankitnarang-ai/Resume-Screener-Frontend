@@ -1,0 +1,66 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>AI Engineering Toolkit</h1>
+    <div class="user-profile">
+      <mat-icon>account_circle</mat-icon>
+      <span>Welcome, Engineer</span>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <!-- Quick Access Cards -->
+    <div class="quick-access">
+      <h2>Quick Access</h2>
+      <div class="card-grid">
+        <div class="feature-card" [ngClass]="{'active': activeFeature === 'resume'}" (click)="setActiveFeature('resume')">
+          <div class="card-icon">
+            <mat-icon>description</mat-icon>
+          </div>
+          <h3>Resume Analyzer</h3>
+          <p>AI-powered resume parsing and optimization</p>
+        </div>
+
+        <div class="feature-card" [ngClass]="{'active': activeFeature === 'interview'}" (click)="setActiveFeature('interview')">
+          <div class="card-icon">
+            <mat-icon>video_camera_front</mat-icon>
+          </div>
+          <h3>AI Interview</h3>
+          <p>Automates initial HR screenings with natural conversation analysis</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Feature Area -->
+    <div [ngClass]="{'feature-container': activeFeature === 'interview'}">
+   
+      @if (activeFeature === 'interview') {
+        <div class="coming-soon">
+          <mat-icon>construction</mat-icon>
+          <h3>AI Interview - Coming Soon</h3>
+          <p>Hire best candidates without extra efforts</p>
+        </div>
+      }
+    </div>
+
+    <!-- Recent Activity -->
+    <!-- <div class="recent-activity">
+      <h2>Recent Activity</h2>
+      <div class="activity-list">
+        <div class="activity-item">
+          <mat-icon>task_alt</mat-icon>
+          <div>
+            <p>Resume analysis completed - Senior Engineer.pdf</p>
+            <small>2 hours ago</small>
+          </div>
+        </div>
+        <div class="activity-item">
+          <mat-icon>schedule</mat-icon>
+          <div>
+            <p>Code review scheduled for tomorrow</p>
+            <small>Yesterday</small>
+          </div>
+        </div>
+      </div>
+    </div> -->
+  </div>
+</div>
