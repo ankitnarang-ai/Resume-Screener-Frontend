@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
-  imports: [RouterModule, CommonModule, SidebarComponent, MatIconModule]
+  imports: [RouterModule, CommonModule, MatIconModule]
 })
 export class AppComponent {
    isSidebarCollapsed = false;
