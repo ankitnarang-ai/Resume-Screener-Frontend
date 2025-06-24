@@ -1,18 +1,28 @@
-import { Component, ViewChild, ElementRef, AfterViewChecked, HostListener } from '@angular/core';
+// ask-question.component.ts
+import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { environment } from '../../../../environment';
+import { SearchResultsService } from '../../services/search-result/search-results.service';
 
-interface Message {
+interface JobTemplate {
   id: string;
-  role: 'user' | 'assistant';
-  content: string;
+  title: string;
+  summary: string;
+  icon: string;
+  description: string;
+}
+
+interface SearchResult {
+  id: string;
+  query: string;
+  matchType: 'strong' | 'moderate';
   timestamp: Date;
-  jobDescription?: string;
-  matchType?: string;
-  candidates?: Candidate[];
+  candidates: Candidate[];
+  expanded?: boolean;
 }
 
 interface Candidate {
@@ -20,7 +30,6 @@ interface Candidate {
   name: string;
   filename: string;
   matchType: 'strong' | 'moderate';
-  reviewType: 'ai' | 'human';
   status: 'pending' | 'invited' | 'rejected';
 }
 
@@ -29,245 +38,152 @@ interface Candidate {
   selector: 'app-ask-question',
   templateUrl: './ask-question.component.html',
   styleUrls: ['./ask-question.component.scss'],
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    MatIconModule
-  ],
+  imports: [CommonModule, FormsModule, MatIconModule],
 })
-export class AskQuestionComponent implements AfterViewChecked {
+export class AskQuestionComponent {
   @ViewChild('jobDescriptionInput') jobDescriptionInput!: ElementRef<HTMLTextAreaElement>;
   
-  messages: Message[] = [];
   jobDescription = '';
-  matchType = 'moderate'; // default to moderate
+  matchType: 'strong' | 'moderate' = 'moderate';
   isLoading = false;
-  isDropdownOpen = false;
-  private shouldScrollToBottom = false;
-  openDropdowns: Set<string> = new Set();
 
-  matchTypes = [
-    { 
-      value: 'strong', 
-      viewValue: 'Strong Match',
-      description: '100% mandatory requirements'
-    },
-    { 
-      value: 'moderate', 
-      viewValue: 'Moderate Match',
-      description: '≥70% key requirements'
-    }
-  ];
-
-  reviewTypes = [
-    { value: 'ai', label: 'AI Review' },
-    { value: 'human', label: 'Human Review' }
-  ];
-
-  sampleJobDescriptions = [
+  jobTemplates: JobTemplate[] = [
     {
+      id: 'senior-engineer',
       title: 'Senior Software Engineer',
-      description: `We are looking for a Senior Software Engineer with:
-• 5+ years of experience in Python programming
-• Strong background in machine learning and AI
+      summary: 'Full-stack developer with 5+ years experience',
+      icon: 'code',
+      description: `We are seeking a Senior Software Engineer with:
+• 5+ years of professional software development experience
+• Strong proficiency in Python, JavaScript, or Java
 • Experience with cloud platforms (AWS, Azure, or GCP)
 • Bachelor's degree in Computer Science or related field
 • Experience with databases (SQL/NoSQL)
-• Knowledge of software development best practices`
+• Knowledge of software development best practices and agile methodologies
+• Strong problem-solving and communication skills`
     },
     {
-      title: 'Full Stack Developer',
-      description: `Required qualifications:
-• 3+ years of full-stack development experience
-• Proficiency in JavaScript, React, Node.js
-• Experience with databases (MongoDB, PostgreSQL)
-• Knowledge of RESTful APIs and microservices
-• Familiarity with version control (Git)
-• Strong problem-solving skills`
+      id: 'product-manager',
+      title: 'Product Manager',
+      summary: 'Strategic product leader with market analysis experience',
+      icon: 'trending_up',
+      description: `We are looking for a Product Manager with:
+• 3+ years of product management experience
+• Strong analytical and market research skills
+• Experience with product roadmap development
+• Bachelor's degree in Business, Engineering, or related field
+• Excellent communication and stakeholder management skills
+• Knowledge of agile development methodologies
+• Experience with product analytics tools`
     },
     {
+      id: 'ui-ux-designer',
+      title: 'UI/UX Designer',
+      summary: 'Creative designer with user-centered design expertise',
+      icon: 'palette',
+      description: `We are seeking a UI/UX Designer with:
+• 3+ years of UI/UX design experience
+• Proficiency in design tools (Figma, Sketch, Adobe Creative Suite)
+• Strong portfolio demonstrating user-centered design process
+• Experience with user research and usability testing
+• Knowledge of design systems and accessibility standards
+• Bachelor's degree in Design, HCI, or related field
+• Excellent visual design and prototyping skills`
+    },
+    {
+      id: 'data-scientist',
       title: 'Data Scientist',
-      description: `We need a Data Scientist with:
+      summary: 'Analytical expert with machine learning experience',
+      icon: 'analytics',
+      description: `We are looking for a Data Scientist with:
+• 4+ years of data science and analytics experience
+• Strong proficiency in Python, R, or similar languages
+• Experience with machine learning frameworks (TensorFlow, PyTorch, scikit-learn)
+• Knowledge of statistical analysis and data modeling
+• Experience with big data technologies (Spark, Hadoop)
 • Master's degree in Data Science, Statistics, or related field
-• 4+ years of experience in data analysis and modeling
-• Proficiency in Python, R, SQL
-• Experience with machine learning frameworks (TensorFlow, PyTorch)
-• Knowledge of statistical analysis and data visualization
-• Experience with big data technologies`
+• Strong communication skills for presenting insights to stakeholders`
     }
   ];
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private searchResultsService: SearchResultsService
+  ) {}
 
-  ngAfterViewChecked() {
-    if (this.shouldScrollToBottom) {
-      this.scrollToBottom();
-      this.shouldScrollToBottom = false;
-    }
+  canSearch(): boolean {
+    return this.jobDescription.trim().length >= 20;
   }
 
-  // Close dropdown when clicking outside
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event) {
-    const target = event.target as HTMLElement;
-    const dropdown = target.closest('.custom-select');
-    const candidateDropdown = target.closest('.candidate-review-dropdown');
-    
-    if (!dropdown) {
-      this.isDropdownOpen = false;
-    }
-    
-    if (!candidateDropdown) {
-      this.openDropdowns.clear();
-    }
+  shouldShowTemplates(): boolean {
+    return !this.jobDescription.trim();
   }
 
-  // Dropdown methods
-  toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
-  }
-
-  toggleCandidateDropdown(candidateId: string) {
-    if (this.openDropdowns.has(candidateId)) {
-      this.openDropdowns.delete(candidateId);
-    } else {
-      this.openDropdowns.clear();
-      this.openDropdowns.add(candidateId);
-    }
-  }
-
-  isCandidateDropdownOpen(candidateId: string): boolean {
-    return this.openDropdowns.has(candidateId);
-  }
-
-  selectMatchType(value: string) {
-    this.matchType = value;
-    this.isDropdownOpen = false;
-  }
-
-  selectReviewType(candidateId: string, reviewType: any) {
-    // Find the candidate and update their review type
-    this.messages.forEach(message => {
-      if (message.candidates) {
-        const candidate = message.candidates.find(c => c.id === candidateId);
-        if (candidate) {
-          candidate.reviewType = reviewType;
-        }
-      }
-    });
-    this.openDropdowns.delete(candidateId);
-  }
-
-  inviteCandidate(candidateId: string) {
-    // Find the candidate and update their status
-    this.messages.forEach(message => {
-      if (message.candidates) {
-        const candidate = message.candidates.find(c => c.id === candidateId);
-        if (candidate) {
-          candidate.status = 'invited';
-          console.log(`Inviting candidate: ${candidate.name} for interview`);
-          // Here you would typically make an API call to invite the candidate
-        }
-      }
-    });
-  }
-
-  rejectCandidate(candidateId: string) {
-    // Find the candidate and update their status
-    this.messages.forEach(message => {
-      if (message.candidates) {
-        const candidate = message.candidates.find(c => c.id === candidateId);
-        if (candidate) {
-          candidate.status = 'rejected';
-          console.log(`Rejecting candidate: ${candidate.name}`);
-          // Here you would typically make an API call to reject the candidate
-        }
-      }
-    });
-  }
-
-  getSelectedMatchType() {
-    return this.matchTypes.find(type => type.value === this.matchType) || this.matchTypes[1];
-  }
-
-  useSampleJobDescription(description: string) {
-    this.jobDescription = description;
-    this.jobDescriptionInput?.nativeElement.focus();
+  useTemplate(template: JobTemplate) {
+    this.jobDescription = template.description;
+    this.focusTextarea();
   }
 
   onKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' && event.ctrlKey) {
       event.preventDefault();
-      this.findMatches();
+      if (this.canSearch() && !this.isLoading) {
+        this.findMatches();
+      }
     }
-  }
-
-  findMatches() {
-    if (!this.jobDescription.trim() || this.isLoading) return;
-
-    const userMessage: Message = {
-      id: this.generateId(),
-      role: 'user',
-      content: `Job Description: ${this.jobDescription}\n\nMatch Type: ${this.getMatchTypeLabel()}`,
-      timestamp: new Date(),
-      jobDescription: this.jobDescription,
-      matchType: this.matchType
-    };
-
-    this.messages.push(userMessage);
-    this.isLoading = true;
-    this.shouldScrollToBottom = true;
-
-    // Create the question in the format expected by your backend
-    const question = `Find ${this.matchType} matches for the following job description:\n\n${this.jobDescription}`;
-
-    this.http.post(`${environment.BASE_URL}/ask`, { question })
-      .subscribe({
-        next: (response: any) => {
-          const candidates = this.parseAnswer(response.answer);
-          const assistantMessage: Message = {
-            id: this.generateId(),
-            role: 'assistant',
-            content: response.answer,
-            timestamp: new Date(),
-            candidates: candidates
-          };
-          
-          this.messages.push(assistantMessage);
-          this.isLoading = false;
-          this.shouldScrollToBottom = true;
-        },
-        error: (error) => {
-          console.error('Error:', error);
-          const errorMessage: Message = {
-            id: this.generateId(),
-            role: 'assistant',
-            content: 'Sorry, there was an error processing your request. Please try again.',
-            timestamp: new Date()
-          };
-          this.messages.push(errorMessage);
-          this.isLoading = false;
-          this.shouldScrollToBottom = true;
-        }
-      });
   }
 
   clearForm() {
     this.jobDescription = '';
     this.matchType = 'moderate';
+    this.focusTextarea();
   }
 
-  clearChat() {
-    this.messages = [];
-    this.openDropdowns.clear();
+  findMatches() {
+    if (!this.canSearch() || this.isLoading) return;
+
+    this.isLoading = true;
+    
+    const searchResult: SearchResult = {
+      id: this.generateId(),
+      query: this.jobDescription,
+      matchType: this.matchType,
+      timestamp: new Date(),
+      candidates: []
+    };
+
+    // Set loading state in service
+    this.searchResultsService.setLoading(true);
+    
+    // Add to service and navigate to results
+    this.searchResultsService.addResult(searchResult);
+    this.router.navigate(['/results']);
+
+    const question = `Find ${this.matchType} matches for the following job description:\n\n${this.jobDescription}`;
+
+    this.http.post(`${environment.BASE_URL}/ask`, { question })
+      .subscribe({
+        next: (response: any) => {
+          const candidates = this.parseResponse(response.answer);
+          searchResult.candidates = candidates;
+          this.searchResultsService.updateResult(searchResult);
+          this.searchResultsService.setStats(`${candidates.length} candidates analyzed`);
+        },
+        error: (error) => {
+          console.error('Search error:', error);
+          searchResult.candidates = [];
+          this.searchResultsService.updateResult(searchResult);
+          this.searchResultsService.setStats('Search failed - please try again');
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.searchResultsService.setLoading(false);
+        }
+      });
   }
 
-  getMatchTypeLabel(): string {
-    const matchType = this.matchTypes.find(type => type.value === this.matchType);
-    return matchType ? `${matchType.viewValue} (${matchType.description})` : this.matchType;
-  }
-
-  private parseAnswer(answer: string): Candidate[] {
+  private parseResponse(answer: string): Candidate[] {
     const candidates: Candidate[] = [];
     const lines = answer.split('\n').filter(line => line.trim());
     
@@ -276,8 +192,6 @@ export class AskQuestionComponent implements AfterViewChecked {
       if (trimmedLine.startsWith('- Strong Match:') || trimmedLine.startsWith('- Moderate Match:')) {
         const isStrongMatch = trimmedLine.startsWith('- Strong Match:');
         const matchType = isStrongMatch ? 'strong' : 'moderate';
-        
-        // Extract name and filename
         const content = trimmedLine.replace(/- (Strong|Moderate) Match:\s*/, '');
         const parts = content.split(' | ');
         
@@ -290,7 +204,6 @@ export class AskQuestionComponent implements AfterViewChecked {
             name,
             filename,
             matchType,
-            reviewType: 'ai', // default to AI review
             status: 'pending'
           });
         }
@@ -300,11 +213,10 @@ export class AskQuestionComponent implements AfterViewChecked {
     return candidates;
   }
 
-  private scrollToBottom() {
-    const messageContainer = document.querySelector('.results-container');
-    if (messageContainer) {
-      messageContainer.scrollTop = messageContainer.scrollHeight;
-    }
+  private focusTextarea() {
+    setTimeout(() => {
+      this.jobDescriptionInput?.nativeElement.focus();
+    }, 100);
   }
 
   private generateId(): string {

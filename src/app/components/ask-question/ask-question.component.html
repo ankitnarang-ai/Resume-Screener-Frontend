@@ -1,270 +1,146 @@
 <div class="resume-matcher">
   <!-- Header -->
-  <div class="matcher-header">
-    <h2>Resume Matcher</h2>
-    <p class="subtitle">Find the best candidates for your job requirements</p>
-  </div>
+  <header class="matcher-header">
+    <h1>Resume Matcher</h1>
+    <p>Find the perfect candidates for your job requirements</p>
+  </header>
 
-  <!-- Job Description Form -->
-  <div class="job-form">
-    <div class="form-group">
-      <label for="jobDescription">Job Description & Requirements</label>
-      <textarea
-        id="jobDescription"
-        [(ngModel)]="jobDescription"
-        placeholder="Enter the job description with specific requirements, skills, and qualifications..."
-        rows="8"
-        #jobDescriptionInput
-        (keydown)="onKeyDown($event)"
-      ></textarea>
-      <div class="form-hint">
-        <mat-icon>info</mat-icon>
-        <span>Press Ctrl+Enter to find matches</span>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label for="matchType">Match Type</label>
-        <div class="custom-select" [class.active]="isDropdownOpen">
-          <div class="select-trigger" (click)="toggleDropdown()">
-            <span class="select-value">
-              <span class="option-label">{{ getSelectedMatchType().viewValue }}</span>
-              <span class="option-description">{{ getSelectedMatchType().description }}</span>
-            </span>
-            <mat-icon class="select-arrow" [class.rotated]="isDropdownOpen">expand_more</mat-icon>
-          </div>
-          <div class="select-options" [class.show]="isDropdownOpen">
-            @for (type of matchTypes; track type.value) {
-              <div 
-                class="select-option" 
-                [class.selected]="matchType === type.value"
-                (click)="selectMatchType(type.value)"
-              >
-                <span class="option-label">{{ type.viewValue }}</span>
-                <span class="option-description">{{ type.description }}</span>
-              </div>
-            }
-          </div>
+  <!-- Main Content Container -->
+  <div class="matcher-content">
+    
+    <!-- Job Input Section -->
+    <section class="job-input-section">
+      <div class="input-container">
+        <label for="jobDescription" class="input-label">
+          <mat-icon>work</mat-icon>
+          Job Description & Requirements
+        </label>
+        <textarea
+          id="jobDescription"
+          [(ngModel)]="jobDescription"
+          placeholder="Describe the role, required skills, experience level, qualifications, and any specific requirements..."
+          class="job-textarea"
+          #jobDescriptionInput
+          (keydown)="onKeyDown($event)"
+          [class.has-content]="jobDescription.trim().length > 0"
+        ></textarea>
+        
+        <!-- Character Counter -->
+        <div class="input-meta">
+          <span class="char-count" [class.warning]="jobDescription.length > 1000">
+            {{ jobDescription.length }}/1500 characters
+          </span>
+          <span class="shortcut-hint">
+            <mat-icon>keyboard</mat-icon>
+            Ctrl+Enter to search
+          </span>
         </div>
       </div>
 
-      <div class="form-actions">
-        <button 
-          class="btn btn-secondary"
-          (click)="clearForm()"
-          [disabled]="isLoading"
-          type="button"
-        >
-          <mat-icon>clear</mat-icon>
-          Clear
-        </button>
-        <button 
-          class="btn btn-primary"
-          (click)="findMatches()"
-          [disabled]="!jobDescription.trim() || isLoading"
-          type="button"
-        >
-          @if (isLoading) {
-            <mat-icon class="spinner">autorenew</mat-icon>
-            Finding Matches...
-          } @else {
-            <mat-icon>search</mat-icon>
-            Find Matches
-          }
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Sample Job Descriptions (show when no messages) -->
-  @if (messages.length === 0 && !jobDescription.trim()) {
-    <div class="samples">
-      <h3>Sample Job Descriptions</h3>
-      <div class="sample-grid">
-        @for (sample of sampleJobDescriptions; track sample.title) {
-          <div class="sample-card" (click)="useSampleJobDescription(sample.description)">
-            <h4>{{ sample.title }}</h4>
-            <p>{{ sample.description | slice:0:120 }}...</p>
-            <span class="use-sample">Use this sample</span>
-          </div>
-        }
-      </div>
-    </div>
-  }
-
-  <!-- Results Section -->
-  @if (messages.length > 0) {
-    <div class="results-section">
-      <div class="results-header">
-        <h3>Matching Results</h3>
-        <button 
-          class="btn btn-ghost"
-          (click)="clearChat()"
-          type="button"
-        >
-          <mat-icon>delete</mat-icon>
-          Clear Results
-        </button>
-      </div>
-
-      <div class="results-container">
-        @for (message of messages; track message.id) {
-          <div class="result-item" [class]="message.role">
-            @if (message.role === 'user') {
-              <div class="query-summary">
-                <div class="query-header">
-                  <mat-icon>work</mat-icon>
-                  <span>Job Requirements</span>
-                  <span class="match-type-badge" [class]="message.matchType">
-                    {{ getMatchTypeLabel() }}
-                  </span>
-                </div>
-                <div class="job-description-preview">
-                  {{ message.jobDescription | slice:0:200 }}
-                  @if (message.jobDescription && message.jobDescription.length > 200) {
-                    <span class="read-more">...</span>
-                  }
-                </div>
+      <!-- Controls Row -->
+      <div class="controls-row">
+        <!-- Match Type Selection -->
+        <div class="match-type-selector">
+          <label class="control-label">Match Criteria</label>
+          <div class="radio-group">
+            <label class="radio-option" [class.selected]="matchType === 'moderate'">
+              <input 
+                type="radio" 
+                name="matchType" 
+                value="moderate" 
+                [(ngModel)]="matchType"
+              >
+              <div class="radio-content">
+                <span class="radio-title">Moderate Match</span>
+                <span class="radio-desc">≥70% requirements</span>
               </div>
+            </label>
+            <label class="radio-option" [class.selected]="matchType === 'strong'">
+              <input 
+                type="radio" 
+                name="matchType" 
+                value="strong" 
+                [(ngModel)]="matchType"
+              >
+              <div class="radio-content">
+                <span class="radio-title">Strong Match</span>
+                <span class="radio-desc">All requirements</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button 
+            type="button"
+            class="btn btn-secondary"
+            (click)="clearForm()"
+            [disabled]="isLoading || !jobDescription.trim()"
+          >
+            <mat-icon>refresh</mat-icon>
+            Clear
+          </button>
+          <button 
+            type="button"
+            class="btn btn-primary"
+            (click)="findMatches()"
+            [disabled]="!canSearch() || isLoading"
+          >
+            @if (isLoading) {
+              <mat-icon class="spinning">autorenew</mat-icon>
+              Searching...
             } @else {
-              <div class="matches-result">
-                <div class="result-header">
-                  <mat-icon>people</mat-icon>
-                  <span>Candidate Matches</span>
-                  @if (message.candidates && message.candidates.length > 0) {
-                    <span class="candidates-count">{{ message.candidates.length }} candidates found</span>
-                  }
-                </div>
-                
-                <!-- Candidate Cards -->
-                @if (message.candidates && message.candidates.length > 0) {
-                  <div class="candidates-grid">
-                    @for (candidate of message.candidates; track candidate.id) {
-                      <div class="candidate-card" [class]="candidate.matchType + ' ' + candidate.status">
-                        <div class="candidate-header">
-                          <div class="candidate-info">
-                            <h4 class="candidate-name">{{ candidate.name }}</h4>
-                            <p class="candidate-file">
-                              <mat-icon>description</mat-icon>
-                              {{ candidate.filename }}
-                            </p>
-                          </div>
-                          <div class="match-badge" [class]="candidate.matchType">
-                            @if (candidate.matchType === 'strong') {
-                              <mat-icon>star</mat-icon>
-                              Strong Match
-                            } @else {
-                              <mat-icon>check_circle</mat-icon>
-                              Moderate Match
-                            }
-                          </div>
-                        </div>
-
-                        <div class="candidate-actions">
-                          <!-- Review Type Dropdown -->
-                          <div class="candidate-review-dropdown" [class.active]="isCandidateDropdownOpen(candidate.id)">
-                            <div class="review-trigger" (click)="toggleCandidateDropdown(candidate.id)">
-                              <mat-icon>{{ candidate.reviewType === 'ai' ? 'smart_toy' : 'person' }}</mat-icon>
-                              <span>{{ candidate.reviewType === 'ai' ? 'AI Review' : 'Human Review' }}</span>
-                              <mat-icon class="dropdown-arrow" [class.rotated]="isCandidateDropdownOpen(candidate.id)">expand_more</mat-icon>
-                            </div>
-                            <div class="review-options" [class.show]="isCandidateDropdownOpen(candidate.id)">
-                              @for (reviewType of reviewTypes; track reviewType.value) {
-                                <div 
-                                  class="review-option" 
-                                  [class.selected]="candidate.reviewType === reviewType.value"
-                                  (click)="selectReviewType(candidate.id, reviewType.value)"
-                                >
-                                  <mat-icon>{{ reviewType.value === 'ai' ? 'smart_toy' : 'person' }}</mat-icon>
-                                  <span>{{ reviewType.label }}</span>
-                                </div>
-                              }
-                            </div>
-                          </div>
-
-                          <!-- Action Buttons -->
-                          <div class="action-buttons">
-                            <button 
-                              class="btn btn-success"
-                              (click)="inviteCandidate(candidate.id)"
-                              [disabled]="candidate.status === 'invited'"
-                              type="button"
-                            >
-                              @if (candidate.status === 'invited') {
-                                <mat-icon>check</mat-icon>
-                                Invited
-                              } @else {
-                                <mat-icon>send</mat-icon>
-                                Invite
-                              }
-                            </button>
-                            
-                            <button 
-                              class="btn btn-danger"
-                              (click)="rejectCandidate(candidate.id)"
-                              [disabled]="candidate.status === 'rejected'"
-                              type="button"
-                            >
-                              @if (candidate.status === 'rejected') {
-                                <mat-icon>block</mat-icon>
-                                Rejected
-                              } @else {
-                                <mat-icon>close</mat-icon>
-                                Reject
-                              }
-                            </button>
-                          </div>
-                        </div>
-
-                        <!-- Status Indicator -->
-                        @if (candidate.status !== 'pending') {
-                          <div class="status-indicator" [class]="candidate.status">
-                            @if (candidate.status === 'invited') {
-                              <mat-icon>mail_outline</mat-icon>
-                              <span>Interview invitation sent</span>
-                            } @else if (candidate.status === 'rejected') {
-                              <mat-icon>cancel</mat-icon>
-                              <span>Candidate rejected</span>
-                            }
-                          </div>
-                        }
-                      </div>
-                    }
-                  </div>
-                } @else {
-                  <div class="no-candidates">
-                    <mat-icon>search_off</mat-icon>
-                    <p>No matching candidates found for the specified requirements.</p>
-                  </div>
-                }
-              </div>
+              <mat-icon>search</mat-icon>
+              Find Candidates
             }
-          </div>
-        }
-
-        <!-- Loading indicator -->
-        @if (isLoading) {
-          <div class="result-item assistant">
-            <div class="matches-result">
-              <div class="result-header">
-                <mat-icon>people</mat-icon>
-                <span>Analyzing Resumes</span>
-              </div>
-              <div class="loading-content">
-                <div class="typing">
-                  <div class="loading-dots">
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                  </div>
-                  <span>Matching candidates against job requirements...</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        }
+          </button>
+        </div>
       </div>
-    </div>
-  }
+    </section>
+
+    <!-- Quick Start Templates -->
+    @if (shouldShowTemplates()) {
+      <section class="templates-section">
+        <h3>Quick Start Templates</h3>
+        <div class="template-grid">
+          @for (template of jobTemplates; track template.id) {
+            <button 
+              type="button"
+              class="template-card"
+              (click)="useTemplate(template)"
+            >
+              <div class="template-icon">
+                <mat-icon>{{ template.icon }}</mat-icon>
+              </div>
+              <div class="template-content">
+                <h4>{{ template.title }}</h4>
+                <p>{{ template.summary }}</p>
+              </div>
+              <mat-icon class="template-arrow">arrow_forward</mat-icon>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Loading Indicator (only when searching) -->
+    @if (isLoading) {
+      <section class="loading-section">
+        <div class="loading-card">
+          <div class="loading-header">
+            <mat-icon class="spinning">autorenew</mat-icon>
+            <span>Analyzing resumes...</span>
+          </div>
+          <div class="loading-progress">
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+            <p>Matching candidates against your requirements</p>
+          </div>
+        </div>
+      </section>
+    }
+
+  </div>
 </div>

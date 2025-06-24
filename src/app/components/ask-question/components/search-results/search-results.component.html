@@ -1,0 +1,166 @@
+<!-- search-results.component.html -->
+<div class="search-results-container">
+  <!-- Results Section -->
+  @if (hasResults()) {
+    <section class="results-section">
+      <div class="results-header">
+        <div class="results-title">
+          <mat-icon>people</mat-icon>
+          <h3>Search Results</h3>
+          @if (lastSearchStats) {
+            <span class="results-stats">{{ lastSearchStats }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="results-timeline">
+        @for (result of searchResults; track result.id) {
+          <div class="result-entry">
+            
+            <!-- Search Query -->
+            <div class="query-card">
+              <div class="query-header">
+                <mat-icon>search</mat-icon>
+                <span>Search Query</span>
+                <div class="query-meta">
+                  <span class="match-badge" [class]="result.matchType">
+                    {{ result.matchType === 'strong' ? 'Strong Match' : 'Moderate Match' }}
+                  </span>
+                  <time>{{ result.timestamp | date:'short' }}</time>
+                </div>
+              </div>
+              <div class="query-preview">
+                {{ result.query | slice:0:150 }}
+                @if (result.query.length > 150) {
+                  <button type="button" class="expand-btn" (click)="toggleQueryExpansion(result.id)">
+                    {{ result.expanded ? 'Show less' : '...more' }}
+                  </button>
+                }
+                @if (result.expanded) {
+                  <div class="query-full">{{ result.query }}</div>
+                }
+              </div>
+            </div>
+
+            <!-- Candidates -->
+            @if (result.candidates && result.candidates.length > 0) {
+              <div class="candidates-section">
+                <div class="candidates-header">
+                  <span class="candidates-count">{{ result.candidates.length }} candidates found</span>
+                </div>
+                
+                <div class="candidates-list">
+                  @for (candidate of result.candidates; track candidate.id) {
+                    <div class="candidate-item" [class]="getCandidateClasses(candidate)">
+                      <div class="candidate-main">
+                        <div class="candidate-info">
+                          <h4 class="candidate-name">{{ candidate.name }}</h4>
+                          <p class="candidate-file">
+                            <mat-icon>description</mat-icon>
+                            {{ candidate.filename }}
+                          </p>
+                        </div>
+                        
+                        <div class="candidate-match">
+                          <div class="match-indicator" [class]="candidate.matchType">
+                            @if (candidate.matchType === 'strong') {
+                              <mat-icon>star</mat-icon>
+                              <span>Strong</span>
+                            } @else {
+                              <mat-icon>check_circle</mat-icon>
+                              <span>Good</span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="candidate-actions">
+                        <button 
+                          type="button"
+                          class="action-btn invite-btn"
+                          (click)="inviteCandidate(candidate)"
+                          [disabled]="candidate.status === 'invited'"
+                        >
+                          @if (candidate.status === 'invited') {
+                            <mat-icon>check</mat-icon>
+                            Invited
+                          } @else {
+                            <mat-icon>send</mat-icon>
+                            Invite
+                          }
+                        </button>
+                        
+                        <button 
+                          type="button"
+                          class="action-btn reject-btn"
+                          (click)="rejectCandidate(candidate)"
+                          [disabled]="candidate.status === 'rejected'"
+                        >
+                          @if (candidate.status === 'rejected') {
+                            <mat-icon>block</mat-icon>
+                            Rejected
+                          } @else {
+                            <mat-icon>close</mat-icon>
+                            Reject
+                          }
+                        </button>
+                      </div>
+
+                      <!-- Status Indicator -->
+                      @if (candidate.status !== 'pending') {
+                        <div class="status-badge" [class]="candidate.status">
+                          @if (candidate.status === 'invited') {
+                            <mat-icon>mail_outline</mat-icon>
+                            <span>Interview invitation sent</span>
+                          } @else if (candidate.status === 'rejected') {
+                            <mat-icon>cancel</mat-icon>
+                            <span>Candidate rejected</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            } @else {
+            @if (!isLoading) {
+
+              <div class="no-results">
+                <mat-icon>search_off</mat-icon>
+                <h4>No matches found</h4>
+                <p>Try adjusting your requirements or using a different match criteria.</p>
+              </div>
+            }
+            }
+          </div>
+        }
+
+        <!-- Loading State -->
+        @if (isLoading) {
+          <div class="result-entry loading">
+            <div class="loading-card">
+              <div class="loading-header">
+                <mat-icon class="spinning">autorenew</mat-icon>
+                <span>Analyzing resumes...</span>
+              </div>
+              <div class="loading-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill"></div>
+                </div>
+                <p>Matching candidates against your requirements</p>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  } @else {
+    <section class="no-results-section">
+      <div class="no-results">
+        <mat-icon>search</mat-icon>
+        <h3>No Search Results</h3>
+        <p>Enter a job description and requirements to find matching candidates.</p>
+      </div>
+    </section>
+  }
+</div>
