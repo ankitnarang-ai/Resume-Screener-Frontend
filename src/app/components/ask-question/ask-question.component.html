@@ -1,77 +1,146 @@
-<div class="chat-interface">
+<div class="resume-matcher">
   <!-- Header -->
-  <div class="chat-header">
-    <h2>Resume Analysis</h2>
-    <p class="subtitle">Ask questions about your uploaded resumes</p>
-  </div>
+  <header class="matcher-header">
+    <h1>Resume Matcher</h1>
+    <p>Find the perfect candidates for your job requirements</p>
+  </header>
 
-  <!-- Chat Messages (scrollable) -->
-  <div class="chat-messages">
-    <!-- Suggestions (show when no messages) -->
-    @if (messages.length === 0) {
-      <div class="suggestions">
-        <h3>Try asking:</h3>
-        <div class="suggestion-grid">
-          @for (suggestion of suggestionQuestions; track suggestion) {
-            <div class="suggestion-card" (click)="useSuggestion(suggestion)">
-              {{ suggestion }}
-            </div>
-          }
+  <!-- Main Content Container -->
+  <div class="matcher-content">
+    
+    <!-- Job Input Section -->
+    <section class="job-input-section">
+      <div class="input-container">
+        <label for="jobDescription" class="input-label">
+          <mat-icon>work</mat-icon>
+          Job Description & Requirements
+        </label>
+        <textarea
+          id="jobDescription"
+          [(ngModel)]="jobDescription"
+          placeholder="Describe the role, required skills, experience level, qualifications, and any specific requirements..."
+          class="job-textarea"
+          #jobDescriptionInput
+          (keydown)="onKeyDown($event)"
+          [class.has-content]="jobDescription.trim().length > 0"
+        ></textarea>
+        
+        <!-- Character Counter -->
+        <div class="input-meta">
+          <span class="char-count" [class.warning]="jobDescription.length > 1000">
+            {{ jobDescription.length }}/1500 characters
+          </span>
+          <span class="shortcut-hint">
+            <mat-icon>keyboard</mat-icon>
+            Ctrl+Enter to search
+          </span>
         </div>
       </div>
-    }
 
-    <!-- Messages -->
-    @for (message of messages; track message.id) {
-      <div class="message" [class]="message.role">
-        <div class="avatar">
-          @if (message.role === 'user') {
-            <mat-icon>person</mat-icon>
-          } @else {
-            <mat-icon>smart_toy</mat-icon>
-          }
-        </div>
-        <div class="content" [innerHTML]="message.content"></div>
-      </div>
-    }
-
-    <!-- Loading indicator -->
-    @if (isLoading) {
-      <div class="message assistant">
-        <div class="avatar">
-          <mat-icon>smart_toy</mat-icon>
-        </div>
-        <div class="content">
-          <div class="typing">
-            Analyzing
-            <span class="dot">.</span>
-            <span class="dot">.</span>
-            <span class="dot">.</span>
+      <!-- Controls Row -->
+      <div class="controls-row">
+        <!-- Match Type Selection -->
+        <div class="match-type-selector">
+          <label class="control-label">Match Criteria</label>
+          <div class="radio-group">
+            <label class="radio-option" [class.selected]="matchType === 'moderate'">
+              <input 
+                type="radio" 
+                name="matchType" 
+                value="moderate" 
+                [(ngModel)]="matchType"
+              >
+              <div class="radio-content">
+                <span class="radio-title">Moderate Match</span>
+                <span class="radio-desc">≥70% requirements</span>
+              </div>
+            </label>
+            <label class="radio-option" [class.selected]="matchType === 'strong'">
+              <input 
+                type="radio" 
+                name="matchType" 
+                value="strong" 
+                [(ngModel)]="matchType"
+              >
+              <div class="radio-content">
+                <span class="radio-title">Strong Match</span>
+                <span class="radio-desc">All requirements</span>
+              </div>
+            </label>
           </div>
         </div>
-      </div>
-    }
-  </div>
 
-  <!-- Input Area (fixed at bottom) -->
-  <div class="chat-input">
-    <textarea
-      [(ngModel)]="currentMessage"
-      placeholder="Ask about the candidates..."
-      (keydown.enter)="sendMessage()"
-      #messageInput
-      rows="1"
-    ></textarea>
-    <button 
-      class="send-btn"
-      (click)="sendMessage()"
-      [disabled]="!currentMessage.trim() || isLoading"
-    >
-      @if (isLoading) {
-        <mat-icon class="spinner">autorenew</mat-icon>
-      } @else {
-        <mat-icon>send</mat-icon>
-      }
-    </button>
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button 
+            type="button"
+            class="btn btn-secondary"
+            (click)="clearForm()"
+            [disabled]="isLoading || !jobDescription.trim()"
+          >
+            <mat-icon>refresh</mat-icon>
+            Clear
+          </button>
+          <button 
+            type="button"
+            class="btn btn-primary"
+            (click)="findMatches()"
+            [disabled]="!canSearch() || isLoading"
+          >
+            @if (isLoading) {
+              <mat-icon class="spinning">autorenew</mat-icon>
+              Searching...
+            } @else {
+              <mat-icon>search</mat-icon>
+              Find Candidates
+            }
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Start Templates -->
+    @if (shouldShowTemplates()) {
+      <section class="templates-section">
+        <h3>Quick Start Templates</h3>
+        <div class="template-grid">
+          @for (template of jobTemplates; track template.id) {
+            <button 
+              type="button"
+              class="template-card"
+              (click)="useTemplate(template)"
+            >
+              <div class="template-icon">
+                <mat-icon>{{ template.icon }}</mat-icon>
+              </div>
+              <div class="template-content">
+                <h4>{{ template.title }}</h4>
+                <p>{{ template.summary }}</p>
+              </div>
+              <mat-icon class="template-arrow">arrow_forward</mat-icon>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Loading Indicator (only when searching) -->
+    @if (isLoading) {
+      <section class="loading-section">
+        <div class="loading-card">
+          <div class="loading-header">
+            <mat-icon class="spinning">autorenew</mat-icon>
+            <span>Analyzing resumes...</span>
+          </div>
+          <div class="loading-progress">
+            <div class="progress-bar">
+              <div class="progress-fill"></div>
+            </div>
+            <p>Matching candidates against your requirements</p>
+          </div>
+        </div>
+      </section>
+    }
+
   </div>
 </div>
