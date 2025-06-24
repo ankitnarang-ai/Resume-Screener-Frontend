@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  BASE_URL: 'http://localhost:8000', // Update this to your backend URL
+  BASE_URL: 'https://resume-screener-backend-zelt.onrender.com/upload-and-process', // Update this to your backend URL
 }
