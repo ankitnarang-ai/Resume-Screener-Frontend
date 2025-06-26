@@ -1,0 +1,83 @@
+<div class="login-wrapper">
+  <!-- Left: Image -->
+  <div class="login-image">
+    <img src="https://res.cloudinary.com/dm2wxjddh/image/upload/v1750975031/ai-took-interview_juqkjh.png" alt="Login Illustration" />
+  </div>
+
+  <!-- Right: Login Form -->
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h2 class="login-title">Welcome Back</h2>
+        <p class="login-subtitle">Sign in to your account</p>
+      </div>
+
+      @if (errorMessage) {
+        <div class="alert alert-error">{{ errorMessage }}</div>
+      }
+
+      @if (successMessage) {
+        <div class="alert alert-success">{{ successMessage }}</div>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <!-- Email Input -->
+        <div class="form-group">
+          <app-common-input
+            formControlName="email"
+            label="Email Address"
+            placeholder="Enter your email"
+            type="email"
+            prefixIcon="email"
+            [required]="true"
+            [control]="getFormControl('email')"
+          ></app-common-input>
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <app-common-input
+            formControlName="password"
+            label="Password"
+            placeholder="Enter your password"
+            type="password"
+            prefixIcon="lock"
+            [required]="true"
+            [control]="getFormControl('password')"
+          ></app-common-input>
+        </div>
+
+        <!-- Remember Me & Forgot Password -->
+        <div class="form-options">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="rememberMe" />
+            <span class="checkmark"></span>
+            Remember me
+          </label>
+          <a href="#" class="forgot-password">Forgot password?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="submit-button"
+          [disabled]="loginForm.invalid || isLoading"
+          [class.loading]="isLoading"
+        >
+          <span *ngIf="!isLoading">Sign In</span>
+          <span *ngIf="isLoading" class="loading-content">
+            <span class="spinner"></span>
+            Signing in...
+          </span>
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <p>
+          Don't have an account?
+          <a (click)="goToSignup()" class="signup-link">Create account</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

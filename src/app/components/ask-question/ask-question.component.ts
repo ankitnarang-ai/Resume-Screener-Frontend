@@ -29,6 +29,7 @@ interface Candidate {
   id: string;
   name: string;
   filename: string;
+  email?: string;
   matchType: 'strong' | 'moderate';
   status: 'pending' | 'invited' | 'rejected';
 }
@@ -184,6 +185,7 @@ export class AskQuestionComponent {
   }
 
   private parseResponse(answer: string): Candidate[] {
+    
     const candidates: Candidate[] = [];
     const lines = answer.split('\n').filter(line => line.trim());
     
@@ -198,11 +200,13 @@ export class AskQuestionComponent {
         if (parts.length >= 2) {
           const name = parts[0].trim();
           const filename = parts[1].trim();
+          const email = parts[2]?.trim();
           
           candidates.push({
             id: this.generateId(),
             name,
             filename,
+            email: email || '',
             matchType,
             status: 'pending'
           });

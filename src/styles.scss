@@ -1,4 +1,4 @@
-
+@import "tailwindcss";
 // Colors 
 $primary: #2563eb;
 $primary-hover: #1d4ed8;
@@ -57,6 +57,19 @@ $transition: 150ms ease;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+:root {
+  .mat-mdc-form-field {
+    display: block !important;
+  }
+
+  .mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field.mat-mdc-form-field .mdc-notched-outline__notch {
+    border-left: none;
+    border-right: none;
+  }
+
+
 }
 
 html, body {
