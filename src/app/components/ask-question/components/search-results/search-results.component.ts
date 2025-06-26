@@ -4,6 +4,7 @@ import { SearchResultsService } from '../../../../services/search-result/search-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-search-results',
@@ -17,7 +18,9 @@ export class SearchResultsComponent implements OnInit {
   lastSearchStats: string = '';
   isLoading: boolean = false;
 
-  constructor(private searchResultsService: SearchResultsService) {}
+  constructor(
+    private http: HttpClient,
+    private searchResultsService: SearchResultsService) {}
 
   ngOnInit() {
     this.searchResultsService.results$.subscribe(results => {
@@ -51,10 +54,51 @@ export class SearchResultsComponent implements OnInit {
   }
 
   inviteCandidate(candidate: any) {
+
+    const candidateInfo = {
+      hrId:"685843dc5af72037a2beb9d4",
+      candidateEmail: candidate.email,
+      candidateName: candidate.name,
+      interviewType: "ai"
+    }
+    this.http.post(`http://localhost:3000/interview/invite`,  candidateInfo, { withCredentials: true} )
+          .subscribe({
+            next: (response: any) => {
+              console.log('Search response:', response);
+            },
+            error: (error) => {
+              console.error('Search error:', error);
+            },
+            complete: () => {
+              this.isLoading = false;
+              this.searchResultsService.setLoading(false);
+            }
+          });
+          
     this.searchResultsService.updateCandidateStatus(candidate.id, 'invited');
   }
 
   rejectCandidate(candidate: any) {
+    const candidateInfo = {
+      hrId:"685843dc5af72037a2beb9d4",
+      candidateEmail: candidate.email,
+      candidateName: candidate.name,
+      interviewType: "ai"
+    }
+    this.http.post(`http://localhost:3000/interview/reject`,  candidateInfo, { withCredentials: true} )
+          .subscribe({
+            next: (response: any) => {
+              console.log('Search response:', response);
+            },
+            error: (error) => {
+              console.error('Search error:', error);
+            },
+            complete: () => {
+              this.isLoading = false;
+              this.searchResultsService.setLoading(false);
+            }
+          });
+          
     this.searchResultsService.updateCandidateStatus(candidate.id, 'rejected');
   }
 }

@@ -1,0 +1,125 @@
+ @import '../../../../styles.scss';
+
+// Signup form styles using your existing global variables
+
+// Auth container and card layout
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $gray-50;
+  padding: $space-4;
+}
+
+.auth-card {
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $shadow;
+  padding: $space-8;
+  width: 100%;
+  max-width: $max-width;
+}
+
+// Title styling
+.auth-title {
+  text-align: center;
+  font-size: $font-size-lg;
+  font-weight: 600;
+  color: $gray-900;
+  margin-bottom: $space-8;
+}
+
+// Name row layout for first name and last name
+.name-row {
+  display: flex;
+  gap: $space-4;
+  margin-bottom: $space-4;
+
+  .form-group {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  // Mobile responsive: stack vertically
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 0;
+    
+    .form-group {
+      margin-bottom: $space-4;
+    }
+  }
+}
+
+// Form group styling
+.form-group {
+  margin-bottom: $space-4;
+  
+  &:last-of-type {
+    margin-bottom: $space-6;
+  }
+}
+
+// Form label styling
+.form-label {
+  display: block;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  color: $gray-700;
+  margin-bottom: $space-1;
+}
+
+// Error state for inputs
+.input.error {
+  border-color: $error;
+  
+  &:focus {
+    border-color: $error;
+    box-shadow: 0 0 0 3px rgba($error, 0.1);
+  }
+}
+
+// Error text styling
+.error-text {
+  color: $error;
+  font-size: $font-size-xs;
+  margin-top: $space-1;
+}
+
+// Submit button styling
+.submit-btn {
+  width: 100%;
+  
+  .btn-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+  }
+}
+
+// Footer styling
+.auth-footer {
+  margin-top: $space-6;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $gray-600;
+  
+  p {
+    margin: 0;
+  }
+}
+
+// Auth link styling
+.auth-link {
+  color: $primary;
+  cursor: pointer;
+  text-decoration: none;
+  transition: $transition;
+  
+  &:hover {
+    color: $primary-hover;
+    text-decoration: underline;
+  }
+}

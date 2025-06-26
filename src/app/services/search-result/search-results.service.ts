@@ -14,6 +14,7 @@ interface SearchResult {
 interface Candidate {
   id: string;
   name: string;
+  email?: string;
   filename: string;
   matchType: 'strong' | 'moderate';
   status: 'pending' | 'invited' | 'rejected';
