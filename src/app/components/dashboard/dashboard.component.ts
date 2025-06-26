@@ -42,10 +42,10 @@ export class DashboardComponent implements OnInit {
 
   setActiveFeature(feature: string): void {
     this.activeFeature = feature;
+  }
 
-    if (feature === 'resume') {
-      this.router.navigate(['/upload']); 
-    }
+  goToResume(): void {
+    this.router.navigate(['/upload']);
   }
 
   logout(): void {

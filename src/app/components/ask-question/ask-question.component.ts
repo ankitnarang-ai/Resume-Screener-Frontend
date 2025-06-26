@@ -185,7 +185,6 @@ export class AskQuestionComponent {
   }
 
   private parseResponse(answer: string): Candidate[] {
-    console.log("Parsing response:", answer);
     
     const candidates: Candidate[] = [];
     const lines = answer.split('\n').filter(line => line.trim());
@@ -197,9 +196,6 @@ export class AskQuestionComponent {
         const matchType = isStrongMatch ? 'strong' : 'moderate';
         const content = trimmedLine.replace(/- (Strong|Moderate) Match:\s*/, '');
         const parts = content.split(' | ');
-
-        console.log("parts", parts);
-        
         
         if (parts.length >= 2) {
           const name = parts[0].trim();

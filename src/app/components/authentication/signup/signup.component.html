@@ -1,163 +1,111 @@
-<div class="auth-container">
-  <div class="auth-card">
-    <h2 class="auth-title">Sign Up</h2>
-    
-    @if (errorMessage) {
-      <div class="message message-error">
-        {{ errorMessage }}
-      </div>
-    }
-    
-    @if (successMessage) {
-      <div class="message message-success">
-        {{ successMessage }}
-      </div>
-    }
+<div class="signup-wrapper">
+  <!-- Left side: Image -->
+  <div class="signup-image">
+    <img src="https://res.cloudinary.com/dm2wxjddh/image/upload/v1750975058/Gemini_Generated_Image_b42x2gb42x2gb42x_yk0k2a.png" alt="Signup Illustration" />
+  </div>
 
-    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-      <div class="name-row">
-        <div class="form-group">
-          <label for="firstName" class="form-label">First Name</label>
-          <input 
-            type="text" 
-            id="firstName" 
-            formControlName="firstName"
-            class="input"
-            [class.error]="signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched"
-          >
-          @if (signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched) {
-            <div class="error-text">
-              @if (signupForm.get('firstName')?.errors?.['required']) {
-                <span>First name is required</span>
-              }
+  <!-- Right side: Form -->
+  <div class="auth-container">
+    <mat-card class="auth-card">
+      <mat-card-header>
+        <mat-card-title class="auth-title">Create your account</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
+            <div class="form-container">
+                 <div class="name-row">
+            <app-common-input
+              formControlName="firstName"
+              label="First Name"
+              placeholder="Enter your first name"
+              prefixIcon="person"
+              [required]="true"
+              [control]="getFormControl('firstName')"
+              class="name-field"
+            ></app-common-input>
+
+            <app-common-input
+              formControlName="lastName"
+              label="Last Name"
+              placeholder="Enter your last name"
+              prefixIcon="person_outline"
+              [required]="true"
+              [control]="getFormControl('lastName')"
+              class="name-field"
+            ></app-common-input>
+          </div>
+
+          <app-common-input
+            formControlName="email"
+            label="Email"
+            placeholder="Enter your email address"
+            type="email"
+            prefixIcon="email"
+            [required]="true"
+            [control]="getFormControl('email')"
+          ></app-common-input>
+
+          <app-common-select
+            formControlName="role"
+            label="Role"
+            placeholder="Select your role"
+            [options]="roles"
+            prefixIcon="work"
+            [required]="true"
+            [control]="getFormControl('role')"
+          ></app-common-select>
+
+               <app-common-input
+                 formControlName="password"
+                 label="Password"
+                 placeholder="Enter your password"
+                 type="password"
+                 prefixIcon="lock"
+                 hint="Minimum 6 characters required"
+                 [required]="true"
+                 [control]="getFormControl('password')"
+               ></app-common-input>
+     
+               <app-common-input
+                 formControlName="confirmPassword"
+                 label="Confirm Password"
+                 placeholder="Confirm your password"
+                 type="password"
+                 prefixIcon="lock_outline"
+                 [required]="true"
+                 [control]="getFormControl('confirmPassword')"
+                 [customErrorMessage]="getConfirmPasswordError()"
+               ></app-common-input>
+      
             </div>
-          }
-        </div>
+         
 
-        <div class="form-group">
-          <label for="lastName" class="form-label">Last Name</label>
-          <input 
-            type="text" 
-            id="lastName" 
-            formControlName="lastName"
-            class="input"
-            [class.error]="signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched"
+          <button 
+            mat-raised-button
+            color="primary"
+            type="submit" 
+            [disabled]="signupForm.invalid || isLoading"
+            class="submit-btn"
           >
-          @if (signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched) {
-            <div class="error-text">
-              @if (signupForm.get('lastName')?.errors?.['required']) {
-                <span>Last name is required</span>
-              }
-            </div>
-          }
-        </div>
+            @if (isLoading) {
+              <div class="btn-loading">
+                <mat-spinner diameter="20"></mat-spinner>
+                <span>Creating account...</span>
+              </div>
+            } @else {
+              <span>Sign Up</span>
+            }
+          </button>
+        </form>
+      </mat-card-content>
+
+      <div class="auth-footer">
+        <p>
+          Already have an account?
+          <a (click)="goToLogin()" class="signup-link">Login here</a>
+        </p>
       </div>
-
-      <div class="form-group">
-        <label for="email" class="form-label">Email</label>
-        <input 
-          type="email" 
-          id="email" 
-          formControlName="email"
-          class="input"
-          [class.error]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
-        >
-        @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
-          <div class="error-text">
-            @if (signupForm.get('email')?.errors?.['required']) {
-              <span>Email is required</span>
-            }
-            @if (signupForm.get('email')?.errors?.['email']) {
-              <span>Please enter a valid email</span>
-            }
-          </div>
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="role" class="form-label">Role</label>
-        <select 
-          id="role" 
-          formControlName="role"
-          class="input"
-          [class.error]="signupForm.get('role')?.invalid && signupForm.get('role')?.touched"
-        >
-          <option value="">Select a role</option>
-          @for (role of roles; track role.value) {
-            <option [value]="role.value">{{ role.label }}</option>
-          }
-        </select>
-        @if (signupForm.get('role')?.invalid && signupForm.get('role')?.touched) {
-          <div class="error-text">
-            @if (signupForm.get('role')?.errors?.['required']) {
-              <span>Role is required</span>
-            }
-          </div>
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="password" class="form-label">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          formControlName="password"
-          class="input"
-          [class.error]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
-        >
-        @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
-          <div class="error-text">
-            @if (signupForm.get('password')?.errors?.['required']) {
-              <span>Password is required</span>
-            }
-            @if (signupForm.get('password')?.errors?.['minlength']) {
-              <span>Password must be at least 6 characters</span>
-            }
-          </div>
-        }
-      </div>
-
-      <div class="form-group">
-        <label for="confirmPassword" class="form-label">Confirm Password</label>
-        <input 
-          type="password" 
-          id="confirmPassword" 
-          formControlName="confirmPassword"
-          class="input"
-          [class.error]="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched"
-        >
-        @if (signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched) {
-          <div class="error-text">
-            @if (signupForm.get('confirmPassword')?.errors?.['required']) {
-              <span>Confirm password is required</span>
-            }
-            @if (signupForm.get('confirmPassword')?.errors?.['passwordMismatch']) {
-              <span>Passwords do not match</span>
-            }
-          </div>
-        }
-      </div>
-
-      <button 
-        type="submit" 
-        [disabled]="signupForm.invalid || isLoading"
-        class="btn btn-primary submit-btn"
-      >
-        @if (isLoading) {
-          <span class="btn-loading">
-            <span class="spinner"></span>
-            Creating account...
-          </span>
-        } @else {
-          <span>Sign Up</span>
-        }
-      </button>
-    </form>
-
-    <div class="auth-footer">
-      <p>Already have an account? 
-        <a (click)="goToLogin()" class="auth-link">Login here</a>
-      </p>
-    </div>
+    </mat-card>
   </div>
 </div>

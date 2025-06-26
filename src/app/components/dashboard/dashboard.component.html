@@ -1,67 +1,60 @@
-<div class="dashboard-container">
-      <div class="dashboard-header">
-        <h1>AI Engineering Toolkit</h1>
-        <div class="user-profile">
-          <div class="profile-icon">👤</div>
-          <span>Welcome, Engineer</span>
-          <button (click)="logout()" class="logout-btn">Logout</button>
-        </div>
-      </div>
+<div class="dashboard-wrapper">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <h1 class="dashboard-title">QuickHire AI</h1>
+    <button (click)="logout()" class="logout-btn">Logout</button>
+  </div>
 
-      <div class="dashboard-content">
-        <!-- Quick Access Cards -->
-        <div class="quick-access">
-          <h2>Quick Access</h2>
-          <div class="card-grid">
-            <div class="feature-card" 
-                 [class.active]="activeFeature === 'resume'" 
-                 (click)="setActiveFeature('resume')">
-              <div class="card-icon">
-                <span class="icon">📄</span>
-              </div>
-              <h3>Resume Analyzer</h3>
-              <p>AI-powered resume parsing and optimization</p>
-            </div>
-
-            <div class="feature-card" 
-                 [class.active]="activeFeature === 'interview'" 
-                 (click)="setActiveFeature('interview')">
-              <div class="card-icon">
-                <span class="icon">🎥</span>
-              </div>
-              <h3>AI Interview</h3>
-              <p>Automates initial HR screenings with natural conversation analysis</p>
-            </div>
+  <!-- Dashboard Content -->
+  <div class="dashboard-content">
+    <!-- Quick Access Section -->
+    <section class="quick-access">
+      <h2 class="section-title">Quick Access</h2>
+      <div class="card-grid">
+        <!-- Resume Analyzer -->
+        <div
+          class="feature-card"
+          [class.active]="activeFeature === 'resume'"
+          (click)="setActiveFeature('resume')"
+        >
+          <div class="card-icon">📄</div>
+          <div class="card-body">
+            <h3>Resume Analyzer</h3>
+            <p>AI-powered resume parsing and optimization</p>
           </div>
         </div>
 
-        <!-- Active Feature Area -->
-        <div [class.feature-container]="activeFeature === 'interview'">
-          @if (activeFeature === 'interview') {
-            <div class="coming-soon">
-              <span class="construction-icon">🚧</span>
-              <h3>AI Interview - Coming Soon</h3>
-              <p>Hire best candidates without extra efforts</p>
-            </div>
-          }
-        </div>
-
-        <!-- Recent Activity (commented out as in original) -->
-        
-        <div class="recent-activity">
-          <h2>Recent Activity</h2>
-          <div class="activity-list">
-            @for (activity of recentActivities; track activity.id) {
-              <div class="activity-item">
-                <span class="activity-icon">{{ activity.icon }}</span>
-                <div>
-                  <p>{{ activity.description }}</p>
-                  <small>{{ activity.time }}</small>
-                </div>
-              </div>
-            }
+        <!-- AI Interview -->
+        <div
+          class="feature-card"
+          [class.active]="activeFeature === 'interview'"
+          (click)="setActiveFeature('interview')"
+        >
+          <div class="card-icon">🎥</div>
+          <div class="card-body">
+            <h3>AI Interview</h3>
+            <p>Automated HR screening with natural conversation</p>
           </div>
         </div>
-       
       </div>
-    </div>
+    </section>
+
+    <!-- Feature Info Section (below cards) -->
+    <section *ngIf="activeFeature === 'resume'" class="feature-info">
+      <h3>Resume Analyzer</h3>
+      <p>
+       Simplify Your Hiring Process! Upload resumes, add the job description, and instantly get the best-matched candidates—effortlessly!
+      </p>
+      <button class="next-button" (click)="goToResume()">Continue to Resume Analyzer</button>
+    </section>
+
+    <section *ngIf="activeFeature === 'interview'" class="feature-info">
+      <h3>AI Interview</h3>
+      <p>
+        Coming soon! Our AI Interview tool will simulate real HR conversations, 
+        analyze responses, and generate feedback — helping you screen smarter.
+      </p>
+      <button class="next-button" disabled>Coming Soon</button>
+    </section>
+  </div>
+</div>
