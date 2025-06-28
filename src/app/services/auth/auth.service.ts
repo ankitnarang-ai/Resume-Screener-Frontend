@@ -31,7 +31,7 @@ export class AuthService {
   ){}
 
   checkAuthStatus(): Observable<boolean> {
-    return this.httpClient.get<{ isAuthenticated: boolean }>(`${environment.NODE_BASE_URL}/verify-token`, {withCredentials: true}).pipe(
+    return this.httpClient.get<{ isAuthenticated: boolean }>(`${environment.NODE_BASE_URL}/authentication/verify-token`, {withCredentials: true}).pipe(
       map(response => {
         return response.isAuthenticated || true; // If backend just sends 200, assume true
       }),
@@ -48,19 +48,19 @@ export class AuthService {
 
 
   login(credentials: LoginRequest): Observable<any> {
-    return this.httpClient.post(`${environment.NODE_BASE_URL}/public/login`, credentials, {
+    return this.httpClient.post(`${environment.NODE_BASE_URL}/authentication/public/login`, credentials, {
       withCredentials: true
     })
   }
 
   signup(credentials: SignupRequest): Observable<any> {
-    return this.httpClient.post(`${environment.NODE_BASE_URL}/public/signup`, credentials, {
+    return this.httpClient.post(`${environment.NODE_BASE_URL}/authentication/public/signup`, credentials, {
       withCredentials: true
     })
   }
 
   logout():Observable<any> {
-    return this.httpClient.post(`${environment.NODE_BASE_URL}/public/logout`, {}, {
+    return this.httpClient.post(`${environment.NODE_BASE_URL}/authentication/public/logout`, {}, {
       withCredentials: true
     })
   }
