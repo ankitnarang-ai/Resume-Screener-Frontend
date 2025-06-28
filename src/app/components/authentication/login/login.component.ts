@@ -54,9 +54,9 @@ export class LoginComponent {
           // Check for returnUrl in query params
           const returnUrl = this.getReturnUrl();
           
-          setTimeout(() => {
+    
             this.router.navigate([returnUrl]);
-          }, 1000);
+          
         },
         error: (error) => {
           this.isLoading = false;

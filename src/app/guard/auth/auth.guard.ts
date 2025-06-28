@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
-import { 
-  CanActivate, 
-  ActivatedRouteSnapshot, 
-  RouterStateSnapshot, 
+import {
+  CanActivate,
   Router,
-  CanActivateChild 
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  UrlTree
 } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
-import { AuthService } from '../../services/auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service'; // Adjust path if necessary
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthGuard implements CanActivate, CanActivateChild {
+export class AuthGuard implements CanActivate {
 
   constructor(
     private authService: AuthService,
@@ -23,44 +23,18 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean> {
-    return this.checkAuthentication(state.url);
-  }
-
-  canActivateChild(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> {
-    return this.checkAuthentication(state.url);
-  }
-
-  private checkAuthentication(url: string): Observable<boolean> {
-    console.log('AuthGuard: Checking authentication for:', url);
-    
-    // First check if user appears to be logged in locally
-    if (this.authService.getCurrentAuthState()) {
-      console.log('AuthGuard: User appears to be logged in locally');
-      return of(true);
-    }
-
-    // If no local state, try to verify with server
-    console.log('AuthGuard: Verifying with server...');
-    
-    return this.authService.verifyToken().pipe(
-      map((isValid: boolean) => {
-        console.log('AuthGuard: Server verification result:', isValid);
-        
-        if (isValid) {
+  ): Observable<boolean | UrlTree> { // Changed return type to Observable<boolean | UrlTree>
+    // Call the backend authentication status check
+    return this.authService.checkAuthStatus().pipe(
+      map(isAuthenticated => {
+        if (isAuthenticated) {
+          // If the backend confirms authentication, allow access
           return true;
         } else {
-          console.log('AuthGuard: Authentication failed, redirecting to login');
-          this.router.navigate(['/login']);
-          return false;
+          // If the backend indicates not authenticated, redirect to login
+          console.warn('AuthGuard: User not authenticated. Redirecting to login.');
+          return this.router.parseUrl('/login');
         }
-      }),
-      catchError((error) => {
-        this.router.navigate(['/login']);
-        return of(false);
       })
     );
   }
