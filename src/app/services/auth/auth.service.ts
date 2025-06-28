@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { map, tap, catchError } from 'rxjs/operators';
+import { Observable, BehaviorSubject, throwError, firstValueFrom, timer } from 'rxjs';
+import { map, tap, catchError, take } from 'rxjs/operators';
 import { Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -30,32 +30,72 @@ export class AuthService {
   private apiUrl = 'http://localhost:3000/authentication'; 
   private isLoggedInSubject = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.isLoggedInSubject.asObservable();
+  private authStateInitialized = false;
+  private initializationPromise: Promise<void> | null = null;
 
   constructor(
     private http: HttpClient,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
-    // Check if user is already logged in on service initialization
-    this.initializeAuthState();
+    // Initialize auth state with a promise to handle race conditions
+    this.initializationPromise = this.initializeAuthState();
   }
 
   private async initializeAuthState(): Promise<void> {
-    // First check if token exists in cookies
-    const tokenExists = !!this.getCookie('token');
-    console.log('Token exists in cookies:', tokenExists);
-    
-    if (tokenExists) {
-      // Verify token with backend
-      try {
-        await this.verifyToken().toPromise();
-      } catch (error) {
-        console.log('Token verification failed:', error);
+    if (!isPlatformBrowser(this.platformId)) {
+      this.authStateInitialized = true;
+      return;
+    }
+
+    try {
+      // Wait a bit for cookies to be fully available
+      await this.delay(100);
+      
+      // Check for token with retries
+      const token = await this.getTokenWithRetry();
+      console.log('Initial token check:', token);
+      
+      if (token) {
+        // Set initial state to true
+        this.isLoggedInSubject.next(true);
+        
+        // Verify token in background
+        try {
+          await firstValueFrom(this.verifyToken());
+          console.log('Token verified successfully');
+        } catch (error) {
+          console.log('Token verification failed:', error);
+          this.isLoggedInSubject.next(false);
+          this.clearAuthState();
+        }
+      } else {
         this.isLoggedInSubject.next(false);
       }
-    } else {
+    } catch (error) {
+      console.error('Auth initialization error:', error);
       this.isLoggedInSubject.next(false);
+    } finally {
+      this.authStateInitialized = true;
     }
+  }
+
+  private async getTokenWithRetry(maxRetries = 3): Promise<string | null> {
+    for (let i = 0; i < maxRetries; i++) {
+      const token = this.getCookie('token');
+      if (token) {
+        return token;
+      }
+      // Wait before retry
+      if (i < maxRetries - 1) {
+        await this.delay(50);
+      }
+    }
+    return null;
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private getCookie(name: string): string | null {
@@ -63,12 +103,25 @@ export class AuthService {
       return null;
     }
 
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      return parts.pop()?.split(';').shift() || null;
+    try {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) {
+        const cookieValue = parts.pop()?.split(';').shift() || null;
+        console.log(`Cookie ${name}:`, cookieValue);
+        return cookieValue;
+      }
+    } catch (error) {
+      console.error('Error reading cookie:', error);
     }
     return null;
+  }
+
+  private clearAuthState(): void {
+    // Clear cookie if possible
+    if (isPlatformBrowser(this.platformId)) {
+      document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
   }
 
   login(credentials: LoginRequest): Observable<AuthResponse> {
@@ -77,15 +130,25 @@ export class AuthService {
     return this.http.post<AuthResponse>(`${this.apiUrl}/public/login`, credentials, {
       withCredentials: true
     }).pipe(
-      tap((response) => {
+      tap(async (response) => {
         console.log('Login response:', response);
-        console.log('Cookie after login:', this.getCookie('token'));
         
-        // Set authentication state to true
-        this.isLoggedInSubject.next(true);
+        // Wait a bit for cookie to be set
+        await this.delay(100);
         
-        // Navigate to dashboard after successful login
-        this.router.navigate(['/dashboard']);
+        const token = await this.getTokenWithRetry();
+        console.log('Cookie after login:', token);
+        
+        if (token) {
+          // Set authentication state to true
+          this.isLoggedInSubject.next(true);
+          
+          // Navigate to dashboard after successful login
+          this.router.navigate(['/dashboard']);
+        } else {
+          console.error('Token not found after login');
+          this.isLoggedInSubject.next(false);
+        }
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Login error:', error);
@@ -95,7 +158,6 @@ export class AuthService {
     );
   }
 
-  // Enhanced method to verify token with backend
   verifyToken(): Observable<boolean> {
     console.log('Verifying token...');
     
@@ -108,6 +170,7 @@ export class AuthService {
         return true;
       }),
       catchError((error: HttpErrorResponse) => {
+        console.error('Token verification failed:', error);
         this.isLoggedInSubject.next(false);
         return throwError(() => new Error('Token verification failed'));
       })
@@ -129,31 +192,61 @@ export class AuthService {
       tap(() => {
         console.log('Logout successful');
         this.isLoggedInSubject.next(false);
+        this.clearAuthState();
         this.router.navigate(['/login']);
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Logout error:', error);
         // Even if logout fails on server, clear local state
         this.isLoggedInSubject.next(false);
+        this.clearAuthState();
         this.router.navigate(['/login']);
         return throwError(() => error);
       })
     );
   }
 
-  isAuthenticated(): boolean {
-    const isAuth = !!this.getCookie('token') && this.isLoggedInSubject.value;
-    console.log('isAuthenticated check:', isAuth);
+  async isAuthenticated(): Promise<boolean> {
+    // Wait for initialization to complete
+    await this.waitForInitialization();
+    
+    const token = await this.getTokenWithRetry();
+    const isAuth = !!token && this.isLoggedInSubject.value;
+    console.log('isAuthenticated check:', isAuth, 'token present:', !!token, 'subject value:', this.isLoggedInSubject.value);
     return isAuth;
   }
 
-  // Method to get current authentication state synchronously
+  // Synchronous version for cases where you can't use async
+  isAuthenticatedSync(): boolean {
+    const token = this.getCookie('token');
+    const isAuth = !!token && this.isLoggedInSubject.value;
+    console.log('isAuthenticatedSync check:', isAuth);
+    return isAuth;
+  }
+
   getCurrentAuthState(): boolean {
     return this.isLoggedInSubject.value;
   }
 
-  // Method to manually refresh auth state
+  isAuthStateInitialized(): boolean {
+    return this.authStateInitialized;
+  }
+
+  // Wait for the service to be fully initialized
+  async waitForInitialization(): Promise<void> {
+    if (this.initializationPromise) {
+      await this.initializationPromise;
+    }
+  }
+
+  // Method for route guards
+  async waitForAuthState(): Promise<boolean> {
+    await this.waitForInitialization();
+    return this.isAuthenticatedSync();
+  }
+
   refreshAuthState(): void {
-    this.initializeAuthState();
+    this.authStateInitialized = false;
+    this.initializationPromise = this.initializeAuthState();
   }
 }
