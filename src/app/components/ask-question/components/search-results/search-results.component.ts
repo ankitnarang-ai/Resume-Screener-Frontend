@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../../environment';
 
 @Component({
   selector: 'app-search-results',
@@ -61,7 +62,7 @@ export class SearchResultsComponent implements OnInit {
       candidateName: candidate.name,
       interviewType: "ai"
     }
-    this.http.post(`http://localhost:3000/interview/invite`,  candidateInfo, { withCredentials: true} )
+    this.http.post(`${environment.NODE_BASE_URL}/interview/invite`,  candidateInfo, { withCredentials: true} )
           .subscribe({
             next: (response: any) => {
               console.log('Search response:', response);
@@ -85,7 +86,7 @@ export class SearchResultsComponent implements OnInit {
       candidateName: candidate.name,
       interviewType: "ai"
     }
-    this.http.post(`http://localhost:3000/interview/reject`,  candidateInfo, { withCredentials: true} )
+    this.http.post(`${environment.NODE_BASE_URL}/interview/reject`,  candidateInfo, { withCredentials: true} )
           .subscribe({
             next: (response: any) => {
               console.log('Search response:', response);
