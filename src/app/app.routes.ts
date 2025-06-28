@@ -34,7 +34,7 @@ export const routes: Routes = [
   
   {
     path: 'upload',
-    component: UploadPdfComponent
+    component: UploadPdfComponent,
   },
   {
     path: 'chat',
