@@ -1,11 +1,11 @@
 // search-results.component.ts
 import { Component, OnInit } from '@angular/core';
-import { SearchResultsService } from '../../../../services/search-result/search-results.service';
+import { SearchResultsService } from '../../../../../services/search-result/search-results.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../../../environment';
+import { environment } from '../../../../../../../environment';
 
 @Component({
   selector: 'app-search-results',

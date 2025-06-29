@@ -5,8 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { environment } from '../../../../environment';
-import { SearchResultsService } from '../../services/search-result/search-results.service';
+import { environment } from '../../../../../environment';
+import { SearchResultsService } from '../../../services/search-result/search-results.service';
 
 interface JobTemplate {
   id: string;

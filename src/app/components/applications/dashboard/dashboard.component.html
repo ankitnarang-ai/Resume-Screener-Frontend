@@ -1,0 +1,140 @@
+<div class="dashboard-wrapper">
+
+  <div class="dashboard-content">
+    <!-- Analytics Overview -->
+    <section class="analytics-overview">
+      <h2 class="section-title">Analytics Overview</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{totalResumesAnalyzed}}</h3>
+            <p class="stat-label">Resumes Analyzed</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{matchedCandidates}}</h3>
+            <p class="stat-label">Candidates Matched</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📧</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{interviewInvitesSent}}</h3>
+            <p class="stat-label">Interview Invites Sent</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🎥</div>
+          <div class="stat-content">
+            <h3 class="stat-number">{{interviewsCompleted}}</h3>
+            <p class="stat-label">AI Interviews Completed</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="actions-grid">
+        <div class="action-card primary" (click)="goToResume()">
+          <div class="card-icon-large">📄</div>
+          <div class="card-content">
+            <h3>Resume Analyzer</h3>
+            <p>Upload resumes and match them with job descriptions using AI</p>
+            <span class="action-arrow">→</span>
+          </div>
+        </div>
+
+        <!-- <div class="action-card secondary" (click)="goToJobPostings()">
+          <div class="card-icon-large">💼</div>
+          <div class="card-content">
+            <h3>Job Postings</h3>
+            <p>Manage job descriptions and requirements</p>
+            <span class="action-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="action-card tertiary" (click)="goToCandidates()">
+          <div class="card-icon-large">👥</div>
+          <div class="card-content">
+            <h3>Candidate Management</h3>
+            <p>View matched candidates and send interview invitations</p>
+            <span class="action-arrow">→</span>
+          </div>
+        </div>
+
+        <div class="action-card quaternary" (click)="goToInterviews()">
+          <div class="card-icon-large">🎥</div>
+          <div class="card-content">
+            <h3>AI Interviews</h3>
+            <p>Review completed interviews and candidate responses</p>
+            <span class="action-arrow">→</span>
+          </div>
+        </div> -->
+      </div>
+    </section>
+
+    <!-- Recent Activity & Workflow -->
+    <div class="bottom-section">
+      <section class="recent-activity">
+        <h2 class="section-title">Recent Activity</h2>
+        <div class="activity-list">
+          <div class="activity-item" *ngFor="let activity of recentActivities">
+            <div class="activity-icon">{{activity.icon}}</div>
+            <div class="activity-content">
+              <p class="activity-description">{{activity.description}}</p>
+              <span class="activity-time">{{activity.time}}</span>
+            </div>
+            <div class="activity-status" [class]="activity.status">
+              {{activity.statusText}}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workflow-status">
+        <h2 class="section-title">Hiring Workflow</h2>
+        <div class="workflow-steps">
+          <div class="workflow-step completed">
+            <div class="step-icon">📄</div>
+            <div class="step-content">
+              <h4>Resume Collection</h4>
+              <p>{{totalResumesAnalyzed}} resumes uploaded</p>
+            </div>
+          </div>
+
+          <div class="workflow-step completed">
+            <div class="step-icon">🤖</div>
+            <div class="step-content">
+              <h4>AI Matching</h4>
+              <p>{{matchedCandidates}} candidates matched</p>
+            </div>
+          </div>
+
+          <div class="workflow-step" [class.completed]="interviewInvitesSent > 0" [class.active]="interviewInvitesSent === 0 && matchedCandidates > 0">
+            <div class="step-icon">📧</div>
+            <div class="step-content">
+              <h4>Send Invitations</h4>
+              <p>{{interviewInvitesSent}} invites sent</p>
+            </div>
+          </div>
+
+          <div class="workflow-step" [class.completed]="interviewsCompleted > 0" [class.active]="interviewInvitesSent > 0 && interviewsCompleted === 0">
+            <div class="step-icon">🎥</div>
+            <div class="step-content">
+              <h4>AI Interviews</h4>
+              <p>{{interviewsCompleted}} completed</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

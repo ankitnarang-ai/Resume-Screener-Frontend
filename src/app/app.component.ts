@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
-import { UploadPdfComponent } from './components/upload-pdf/upload-pdf.component';
-import { AskQuestionComponent } from './components/ask-question/ask-question.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { SidebarComponent } from './components/applications/sidebar/sidebar.component';
 import { MatIconModule } from '@angular/material/icon';
-
+import { AuthService } from './services/auth/auth.service';
 @Component({
   standalone: true,
   selector: 'app-root',
@@ -14,8 +12,22 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [RouterModule, CommonModule, MatIconModule, SidebarComponent]
 })
 export class AppComponent {
-   isSidebarCollapsed = false;
+  isSidebarCollapsed = false;
 
+  constructor(
+    private authService: AuthService
+  ){
+    this.checkAuth();
+  }
+
+  checkAuth() {
+    this.authService.checkAuthStatus()
+    .subscribe((response) => {
+      console.log("response", response);
+      
+    })
+
+  }
   onSidebarToggle() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }

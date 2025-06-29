@@ -25,13 +25,11 @@ export class AuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> {
     
-    console.log('AuthGuard: Checking authentication...');
     
     return this.authService.checkAuthStatus().pipe(
       take(1),
       map(isAuthenticated => {
         if (isAuthenticated) {
-          console.log('AuthGuard: User authenticated, allowing access');
           return true;
         } else {
           console.warn('AuthGuard: User not authenticated. Redirecting to login.');
