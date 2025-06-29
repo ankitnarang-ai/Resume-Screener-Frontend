@@ -12,6 +12,16 @@
         <p class="login-subtitle">Sign in to your account</p>
       </div>
 
+      <div class="google-wrapper">
+        <div class="google-btn">
+          <app-google-sign-in></app-google-sign-in>
+        </div>
+        <div class="or-separator">
+          <span>OR</span>
+        </div>
+      </div>
+
+
       @if (errorMessage) {
         <div class="alert alert-error">{{ errorMessage }}</div>
       }

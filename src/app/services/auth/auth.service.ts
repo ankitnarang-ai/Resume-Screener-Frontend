@@ -19,50 +19,118 @@ export interface SignupRequest {
 
 export interface AuthResponse {
   message: string;
+  user?: any; // Add user data if your backend sends it
+}
+
+export interface GoogleAuthRequest {
+  token: string; // Google ID token
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  // Optional: Add user state management if needed
+  private currentUserSubject = new BehaviorSubject<any>(null);
+  public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(
     private httpClient: HttpClient
-  ){}
+  ) {}
+
+  get currentUserValue(): any {
+    return this.currentUserSubject.value;
+  }
 
   checkAuthStatus(): Observable<boolean> {
-    return this.httpClient.get<{ isAuthenticated: boolean }>(`${environment.NODE_BASE_URL}/authentication/verify-token`, {withCredentials: true}).pipe(
+    return this.httpClient.get<{ isAuthenticated: boolean; user?: any }>(`${environment.NODE_BASE_URL}/authentication/verify-token`, {withCredentials: true}).pipe(
       map(response => {
-        return response.isAuthenticated || true; // If backend just sends 200, assume true
+        // Update user state if backend sends user data
+        if (response.user) {
+          this.currentUserSubject.next(response.user);
+        }
+        return response.isAuthenticated || true;
       }),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 || error.status === 403) {
           console.warn('Authentication check failed:', error.message);
-          return of(false); // Not authenticated
+          this.currentUserSubject.next(null); // Clear user state
+          return of(false);
         }
         console.error('Error during authentication check:', error);
-        return of(false); // Assume not authenticated for safety
+        this.currentUserSubject.next(null);
+        return of(false);
       })
     );
   }
 
-
-  login(credentials: LoginRequest): Observable<any> {
-    return this.httpClient.post(`${environment.NODE_BASE_URL}/authentication/public/login`, credentials, {
+  login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.httpClient.post<AuthResponse>(`${environment.NODE_BASE_URL}/authentication/public/login`, credentials, {
       withCredentials: true
-    })
+    }).pipe(
+      tap(response => {
+        // Update user state if backend sends user data
+        if (response.user) {
+          this.currentUserSubject.next(response.user);
+        }
+        console.log('Traditional login successful:', response.message);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Traditional login failed:', error);
+        this.currentUserSubject.next(null);
+        return throwError(() => error);
+      })
+    );
   }
 
-  signup(credentials: SignupRequest): Observable<any> {
-    return this.httpClient.post(`${environment.NODE_BASE_URL}/authentication/public/signup`, credentials, {
-      withCredentials: true
-    })
+  // NEW: Google OAuth login method
+  loginWithGoogle(googleIdToken: string): Observable<AuthResponse> {
+    return this.httpClient.post<AuthResponse>(
+      `${environment.NODE_BASE_URL}/authentication/public/google`, 
+      { token: googleIdToken }, // Match your backend's expected format
+      {
+        withCredentials: true, // Important: maintain cookie handling
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    ).pipe(
+      tap(response => {
+        // Update user state if backend sends user data
+        if (response.user) {
+          this.currentUserSubject.next(response.user);
+        }
+        console.log('Google login successful:', response.message);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Google login failed:', error);
+        this.currentUserSubject.next(null);
+        return throwError(() => error);
+      })
+    );
   }
 
-  logout():Observable<any> {
-    return this.httpClient.post(`${environment.NODE_BASE_URL}/authentication/public/logout`, {}, {
+  signup(credentials: SignupRequest): Observable<AuthResponse> {
+    return this.httpClient.post<AuthResponse>(`${environment.NODE_BASE_URL}/authentication/public/signup`, credentials, {
       withCredentials: true
-    })
+    });
   }
 
+  logout(): Observable<AuthResponse> {
+    return this.httpClient.post<AuthResponse>(`${environment.NODE_BASE_URL}/authentication/public/logout`, {}, {
+      withCredentials: true
+    }).pipe(
+      tap(response => {
+        // Clear user state on logout
+        this.currentUserSubject.next(null);
+        console.log('Logout successful:', response.message);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Logout failed:', error);
+        // Clear user state even if logout fails
+        this.currentUserSubject.next(null);
+        return throwError(() => error);
+      })
+    );
+  }
 }

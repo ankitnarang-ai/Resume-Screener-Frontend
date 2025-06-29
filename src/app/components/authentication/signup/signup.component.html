@@ -1,7 +1,9 @@
 <div class="signup-wrapper">
   <!-- Left side: Image -->
   <div class="signup-image">
-    <img src="https://res.cloudinary.com/dm2wxjddh/image/upload/v1750975058/Gemini_Generated_Image_b42x2gb42x2gb42x_yk0k2a.png" alt="Signup Illustration" />
+    <img
+      src="https://res.cloudinary.com/dm2wxjddh/image/upload/v1750975058/Gemini_Generated_Image_b42x2gb42x2gb42x_yk0k2a.png"
+      alt="Signup Illustration" />
   </div>
 
   <!-- Right side: Form -->
@@ -11,90 +13,56 @@
         <mat-card-title class="auth-title">Create your account</mat-card-title>
       </mat-card-header>
 
+      <div class="google-wrapper">
+        <div class="google-btn">
+          <app-google-sign-in></app-google-sign-in>
+        </div>
+        <div class="or-separator">
+          <span>OR</span>
+        </div>
+      </div>
+
+
+
       <mat-card-content>
         <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-            <div class="form-container">
-                 <div class="name-row">
-            <app-common-input
-              formControlName="firstName"
-              label="First Name"
-              placeholder="Enter your first name"
-              prefixIcon="person"
-              [required]="true"
-              [control]="getFormControl('firstName')"
-              class="name-field"
-            ></app-common-input>
+          <div class="form-container">
+            <div class="name-row">
+              <app-common-input formControlName="firstName" label="First Name" placeholder="Enter your first name"
+                prefixIcon="person" [required]="true" [control]="getFormControl('firstName')"
+                class="name-field"></app-common-input>
 
-            <app-common-input
-              formControlName="lastName"
-              label="Last Name"
-              placeholder="Enter your last name"
-              prefixIcon="person_outline"
-              [required]="true"
-              [control]="getFormControl('lastName')"
-              class="name-field"
-            ></app-common-input>
+              <app-common-input formControlName="lastName" label="Last Name" placeholder="Enter your last name"
+                prefixIcon="person_outline" [required]="true" [control]="getFormControl('lastName')"
+                class="name-field"></app-common-input>
+            </div>
+
+            <app-common-input formControlName="email" label="Email" placeholder="Enter your email address" type="email"
+              prefixIcon="email" [required]="true" [control]="getFormControl('email')"></app-common-input>
+
+            <app-common-select formControlName="role" label="Role" placeholder="Select your role" [options]="roles"
+              prefixIcon="work" [required]="true" [control]="getFormControl('role')"></app-common-select>
+
+            <app-common-input formControlName="password" label="Password" placeholder="Enter your password"
+              type="password" prefixIcon="lock" hint="Minimum 6 characters required" [required]="true"
+              [control]="getFormControl('password')"></app-common-input>
+
+            <app-common-input formControlName="confirmPassword" label="Confirm Password"
+              placeholder="Confirm your password" type="password" prefixIcon="lock_outline" [required]="true"
+              [control]="getFormControl('confirmPassword')"
+              [customErrorMessage]="getConfirmPasswordError()"></app-common-input>
+
           </div>
 
-          <app-common-input
-            formControlName="email"
-            label="Email"
-            placeholder="Enter your email address"
-            type="email"
-            prefixIcon="email"
-            [required]="true"
-            [control]="getFormControl('email')"
-          ></app-common-input>
-
-          <app-common-select
-            formControlName="role"
-            label="Role"
-            placeholder="Select your role"
-            [options]="roles"
-            prefixIcon="work"
-            [required]="true"
-            [control]="getFormControl('role')"
-          ></app-common-select>
-
-               <app-common-input
-                 formControlName="password"
-                 label="Password"
-                 placeholder="Enter your password"
-                 type="password"
-                 prefixIcon="lock"
-                 hint="Minimum 6 characters required"
-                 [required]="true"
-                 [control]="getFormControl('password')"
-               ></app-common-input>
-     
-               <app-common-input
-                 formControlName="confirmPassword"
-                 label="Confirm Password"
-                 placeholder="Confirm your password"
-                 type="password"
-                 prefixIcon="lock_outline"
-                 [required]="true"
-                 [control]="getFormControl('confirmPassword')"
-                 [customErrorMessage]="getConfirmPasswordError()"
-               ></app-common-input>
-      
-            </div>
-         
-
-          <button 
-            mat-raised-button
-            color="primary"
-            type="submit" 
-            [disabled]="signupForm.invalid || isLoading"
-            class="submit-btn"
-          >
+          <button mat-raised-button color="primary" type="submit" [disabled]="signupForm.invalid || isLoading"
+            class="submit-btn">
             @if (isLoading) {
-              <div class="btn-loading">
-                <mat-spinner diameter="20"></mat-spinner>
-                <span>Creating account...</span>
-              </div>
+            <div class="btn-loading">
+              <mat-spinner diameter="20"></mat-spinner>
+              <span>Creating account...</span>
+            </div>
             } @else {
-              <span>Sign Up</span>
+            <span>Sign Up</span>
             }
           </button>
         </form>
