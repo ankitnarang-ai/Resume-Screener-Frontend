@@ -4,11 +4,12 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } 
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth.service';
 import { CommonInputComponent } from '../../../shared/common-input/common-input.component';
+import { GoogleSignInComponent } from '../google-sign-in/google-sign-in.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CommonInputComponent],
+  imports: [CommonModule, ReactiveFormsModule, CommonInputComponent, GoogleSignInComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })

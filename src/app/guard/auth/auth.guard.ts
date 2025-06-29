@@ -6,9 +6,9 @@ import {
   RouterStateSnapshot,
   UrlTree
 } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service'; // Adjust path if necessary
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { AuthService } from '../../services/auth/auth.service';
+import { Observable, of } from 'rxjs';
+import { map, catchError, take } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -23,18 +23,22 @@ export class AuthGuard implements CanActivate {
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): Observable<boolean | UrlTree> { // Changed return type to Observable<boolean | UrlTree>
-    // Call the backend authentication status check
+  ): Observable<boolean | UrlTree> {
+    
+    
     return this.authService.checkAuthStatus().pipe(
+      take(1),
       map(isAuthenticated => {
         if (isAuthenticated) {
-          // If the backend confirms authentication, allow access
           return true;
         } else {
-          // If the backend indicates not authenticated, redirect to login
           console.warn('AuthGuard: User not authenticated. Redirecting to login.');
           return this.router.parseUrl('/login');
         }
+      }),
+      catchError(error => {
+        console.error('AuthGuard: Error during authentication check:', error);
+        return of(this.router.parseUrl('/login'));
       })
     );
   }

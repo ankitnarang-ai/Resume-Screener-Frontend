@@ -1,48 +1,64 @@
 import { Routes } from '@angular/router';
-import { UploadPdfComponent } from './components/upload-pdf/upload-pdf.component';
-import { AskQuestionComponent } from './components/ask-question/ask-question.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { SearchResultsComponent } from './components/ask-question/components/search-results/search-results.component';
+import { UploadPdfComponent } from './components/applications/upload-pdf/upload-pdf.component';
+import { AskQuestionComponent } from './components/applications/ask-question/ask-question.component';
+import { DashboardComponent } from './components/applications/dashboard/dashboard.component';
+import { SearchResultsComponent } from './components/applications/ask-question/components/search-results/search-results.component';
 import { LoginComponent } from './components/authentication/login/login.component';
 import { GuestGuard } from './guard/guest/guest.guard';
 import { SignupComponent } from './components/authentication/signup/signup.component';
 import { AuthGuard } from './guard/auth/auth.guard';
+import { AiInterviewComponent } from './components/applications/ai-interview/ai-interview.component';
+import { ApplicationsComponent } from './components/applications/applications.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { 
-    path: 'login', 
+  // Authentication Routes
+  {
+    path: 'login',
     component: LoginComponent,
     canActivate: [GuestGuard] // Prevent authenticated users from accessing login
   },
-  { 
-    path: 'signup', 
+  {
+    path: 'signup',
     component: SignupComponent,
     canActivate: [GuestGuard] // Prevent authenticated users from accessing signup
   },
-  { 
-    path: 'dashboard', 
-    component: DashboardComponent,
-    canActivate: [AuthGuard] // Protect dashboard route
-  },
-  // Add more protected routes here
-  // { 
-  //   path: 'profile', 
-  //   loadComponent: () => import('./profile.component').then(c => c.ProfileComponent),
-  //   canActivate: [AuthGuard]
-  // },
   
+  // Protected Application Routes
+  // These routes require authentication and use the ApplicationsComponent as a layout
   {
-    path: 'upload',
-    component: UploadPdfComponent,
+    path: '',
+    component: ApplicationsComponent,
+    // canActivate: [AuthGuard], // Protect all child routes within this parent
+    children: [
+      {
+        path: 'dashboard',
+        component: DashboardComponent,
+      },
+      {
+        path: 'ai-interview',
+        component: AiInterviewComponent
+      },
+      {
+        path: 'upload',
+        component: UploadPdfComponent,
+      },
+      {
+        path: 'chat',
+        component: AskQuestionComponent
+      },
+      {
+        path: 'results',
+        component: SearchResultsComponent
+      },
+      {
+        path: '', // Default child route for '' (e.g., when navigating to just '/')
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+    ]
   },
-  {
-    path: 'chat',
-    component: AskQuestionComponent
-  },
-  {
-    path: 'results',
-    component: SearchResultsComponent
-  },
-  { path: '**', redirectTo: '/dashboard' } ,
+
+  // Redirect any unmatched paths to the dashboard (or login if not authenticated)
+  // This must be the last route in your configuration
+  { path: '**', redirectTo: '/dashboard' }
 ];

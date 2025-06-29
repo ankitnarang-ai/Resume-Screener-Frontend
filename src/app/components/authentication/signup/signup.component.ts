@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { GoogleSignInComponent } from '../google-sign-in/google-sign-in.component';
 
 @Component({
   selector: 'app-signup',
@@ -23,7 +24,8 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
     MatProgressSpinnerModule,
     MatButtonModule,
     MatCardModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    GoogleSignInComponent
   ],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',

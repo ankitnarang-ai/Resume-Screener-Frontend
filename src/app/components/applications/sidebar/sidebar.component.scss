@@ -1,0 +1,212 @@
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: #ffffff;
+  color: #2d3748;
+  transition: width 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-right: 1px solid #e2e8f0;
+  display: flex; /* Use flexbox for layout */
+  flex-direction: column; /* Stack items vertically */
+
+  &-collapsed {
+    width: 60px;
+    .sidebar-item-text, 
+    .sidebar-item-arrow {
+      display: none;
+    }
+    .sidebar-logo {
+      justify-content: center; /* Center logo when collapsed */
+      mat-icon {
+        margin-right: 0; /* Remove margin when collapsed */
+      }
+    }
+  }
+
+  &-header {
+    padding: 20px;
+    border-bottom: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    flex-shrink: 0; /* Prevent header from shrinking */
+  }
+
+  &-logo {
+    color: #2d3748;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+
+    mat-icon {
+      font-size: 24px;
+      color: #2d3748; /* Ensure logo icon color */
+      margin-right: 8px; /* Default margin */
+    }
+  }
+
+  &-menu {
+    flex-grow: 1; /* Allow menu to take up available space */
+    padding: 10px 0;
+    overflow-y: auto; /* Enable scrolling for long menus */
+    
+    ul {
+      padding: 0;
+      margin: 0;
+    }
+
+    &-item {
+      list-style: none;
+    }
+  }
+
+  &-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: #4a5568;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 0 25px 25px 0;
+    margin-right: 10px;
+    cursor: pointer; /* Indicate clickable */
+
+    &:hover {
+      background: #ebf8ff;
+      color: #3182ce;
+      border-left: 4px solid #4299e1;
+    }
+
+    &.menu-item-active {
+      background: #ebf8ff;
+      color: #3182ce;
+      border-left: 4px solid #4299e1;
+
+      mat-icon {
+        color: #3182ce;
+      }
+    }
+
+    &-text {
+      margin-left: 10px;
+      white-space: nowrap;
+      font-weight: 500;
+      overflow: hidden; /* Hide text overflow when collapsed */
+    }
+
+    &-arrow {
+      margin-left: auto;
+      transition: transform 0.3s ease;
+      color: #718096;
+    }
+  }
+
+  &-submenu {
+    padding: 0;
+    background: #f7fafc;
+    overflow: hidden; /* Hide overflow for smooth collapse */
+    max-height: 0;
+    transition: max-height 0.3s ease-in-out; /* Smooth open/close */
+
+    // This class should be applied to the <li> that contains the parent item and its submenu
+    // when the parent item's children are open
+    .sidebar-menu-item-active & {
+      max-height: 500px; /* Adjust as needed to fit content of submenu */
+    }
+
+    .sidebar-subitem {
+      padding-left: 40px;
+      color: #718096;
+      
+      &:hover {
+        background: #edf2f7;
+        color: #4a5568;
+      }
+
+      &.menu-item-active {
+        background: #edf2f7;
+        color: #3182ce;
+        border-left: 4px solid #4299e1;
+        
+        mat-icon {
+          color: #3182ce;
+        }
+      }
+    }
+  }
+
+  mat-icon {
+    margin-right: 8px;
+    font-size: 20px;
+    vertical-align: middle;
+    color: #718096;
+  }
+
+  .sidebar-item:hover mat-icon {
+    color: #3182ce;
+  }
+
+  // Logout button styling
+  &-footer {
+    border-top: 1px solid #e2e8f0;
+    padding: 10px 0;
+    flex-shrink: 0; /* Prevent footer from shrinking */
+
+    .logout-item {
+      color: #8b0d0d; /* A common red for error/danger */
+
+      &:hover {
+        background: #eeb4b4; /* Darker red on hover */
+        border-left-color: #8b0d0d; /* Darker red border for a cohesive look */
+      }
+
+      mat-icon {
+        color: #8b0d0d; /* Match icon color to text */
+      }
+      &:hover mat-icon {
+        color: #8b0d0d /* Match icon hover color to text hover */
+      }
+    }
+  }
+
+  /* --- Mobile Responsiveness (Max-width 768px) --- */
+  @media (max-width: 768px) {
+    position: fixed; /* Fixed position for sidebar on mobile */
+    height: 100vh;
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width on mobile when open */
+    transform: translateX(-100%); /* Initially hidden off-screen */
+    box-shadow: none; /* Remove box-shadow */
+    border-right: none; /* Remove border-right */
+    transition: transform 0.3s ease-in-out; /* Smooth slide-in/out */
+    z-index: 1000; /* Ensure it's on top of other content */
+
+    // When `isSidebarCollapsed` is FALSE (meaning open/expanded on mobile)
+    &:not(.sidebar-collapsed) {
+      transform: translateX(0); /* Slide in from left to be fully visible */
+      box-shadow: 2px 0 10px rgba(0,0,0,0.2); /* Add shadow for open state */
+    }
+    
+    .sidebar-header {
+      padding: 15px; /* Adjust padding for mobile */
+    }
+    .sidebar-item {
+      padding: 10px 15px; /* Adjust padding for mobile */
+      font-size: 0.95rem; /* Slightly smaller font size */
+      margin-right: 0; /* No margin on right on full width mobile */
+      border-radius: 0; /* No rounded corners for full width on mobile */
+    }
+    .sidebar-submenu .sidebar-subitem {
+      padding-left: 30px; /* Adjust for mobile */
+    }
+    
+    // Adjust logo icon behavior for mobile when collapsed/hidden
+    .sidebar-logo {
+      justify-content: flex-start; /* Align logo text/icon left */
+      mat-icon {
+        margin-right: 8px; /* Ensure margin for menu icon */
+      }
+    }
+  }
+}

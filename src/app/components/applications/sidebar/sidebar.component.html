@@ -1,8 +1,8 @@
 <div class="sidebar" [ngClass]="{ 'sidebar-collapsed': isSidebarCollapsed }">
   <div class="sidebar-header">
-    <a href="#" class="sidebar-logo">
+    <a href="javascript:void(0);" class="sidebar-logo">
       @if (isSidebarCollapsed) {
-        <mat-icon>profile</mat-icon>
+        <mat-icon>menu</mat-icon> <!-- Changed to 'menu' icon for collapsed state -->
       } @else {
         Smart Hire
       }
@@ -14,11 +14,11 @@
       @for (item of menuItems; track item) {
         <li class="sidebar-menu-item">
           <a
-            href="#"
+            href="javascript:void(0);"
             class="sidebar-item"
             [ngClass]="{
               'has-children': item.children,
-              'menu-item-active': item.isOpen
+              'menu-item-active': item === activeItem || isChildOfActive(item)
             }"
             (click)="toggleMenuItem(item)"
           >
@@ -36,7 +36,10 @@
             <ul class="sidebar-submenu">
               @for (child of item.children; track child) {
                 <li>
-                  <a href="#" class="sidebar-item sidebar-subitem">
+                  <a href="javascript:void(0);"
+                     class="sidebar-item sidebar-subitem"
+                     [class.menu-item-active]="child === activeItem"
+                     (click)="selectMenuItem(child)">
                     <mat-icon>{{ child.icon }}</mat-icon>
                     <span class="sidebar-item-text">{{ child.label }}</span>
                   </a>
@@ -47,5 +50,17 @@
         </li>
       }
     </ul>
+  </div>
+
+  <!-- Logout Button Section -->
+  <div class="sidebar-footer">
+    <a
+      href="javascript:void(0);"
+      class="sidebar-item logout-item"
+      (click)="selectMenuItem(logoutItem)"
+    >
+      <mat-icon>{{ logoutItem.icon }}</mat-icon>
+      <span class="sidebar-item-text">{{ logoutItem.label }}</span>
+    </a>
   </div>
 </div>

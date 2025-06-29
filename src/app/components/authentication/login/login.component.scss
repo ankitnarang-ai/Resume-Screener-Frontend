@@ -44,6 +44,42 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+
+    .google-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .google-btn {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin: 1rem 0;
+    }
+
+    .or-separator {
+      display: flex;
+      align-items: center;
+      width: 100%;
+
+      span {
+        padding: 0 1rem;
+        color: #888;
+        font-size: 0.9rem;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      &::before,
+      &::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background-color: #ccc;
+      }
+    }
   }
 }
 
