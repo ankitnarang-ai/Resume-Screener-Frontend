@@ -7,6 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
+import { environment } from '../../../../../environment';
 
 @Component({
   standalone: true,
@@ -67,7 +68,7 @@ export class UploadPdfComponent {
     const formData = new FormData();
     this.selectedFiles.forEach(file => formData.append('files', file));
 
-    this.http.post('https://resume-screener-backend-zelt.onrender.com/upload-and-process', formData)
+    this.http.post(`${environment.BASE_URL}/upload-and-process`, formData)
       .subscribe({
         next: () => {
           this.uploadStatus = 'Success! Resumes analyzed successfully.';
