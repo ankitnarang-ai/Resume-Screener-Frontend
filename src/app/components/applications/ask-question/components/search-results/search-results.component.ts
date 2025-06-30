@@ -1,11 +1,12 @@
 // search-results.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { SearchResultsService } from '../../../../../services/search-result/search-results.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../../../environment';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-search-results',
@@ -14,31 +15,58 @@ import { environment } from '../../../../../../../environment';
   templateUrl: './search-results.component.html',
   styleUrls: ['./search-results.component.scss']
 })
-export class SearchResultsComponent implements OnInit {
+export class SearchResultsComponent implements OnInit, OnDestroy {
   searchResults: any[] = [];
   lastSearchStats: string = '';
   isLoading: boolean = false;
+  
+  private subscriptions: Subscription = new Subscription();
 
   constructor(
     private http: HttpClient,
-    private searchResultsService: SearchResultsService) {}
+    private searchResultsService: SearchResultsService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    this.searchResultsService.results$.subscribe(results => {
-      this.searchResults = results;
-    });
+    
+    // Subscribe to results
+    this.subscriptions.add(
+      this.searchResultsService.results$.subscribe(results => {
+        
+        this.searchResults = results;
+        
+        // Force change detection
+        this.cdr.detectChanges();
+      
+      })
+    );
 
-    this.searchResultsService.stats$.subscribe(stats => {
-      this.lastSearchStats = stats;
-    });
+    // Subscribe to stats
+    this.subscriptions.add(
+      this.searchResultsService.stats$.subscribe(stats => {
+        this.lastSearchStats = stats;
+        this.cdr.detectChanges();
+      })
+    );
 
-    this.searchResultsService.loading$.subscribe(loading => {
-      this.isLoading = loading;
-    });
+    // Subscribe to loading state
+    this.subscriptions.add(
+      this.searchResultsService.loading$.subscribe(loading => {
+        this.isLoading = loading;
+        this.cdr.detectChanges();
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
 
   hasResults(): boolean {
-    return this.searchResults.length > 0;
+    const hasResults = this.searchResults.length > 0;
+    
+    return hasResults;
   }
 
   toggleQueryExpansion(resultId: string) {
@@ -55,51 +83,41 @@ export class SearchResultsComponent implements OnInit {
   }
 
   inviteCandidate(candidate: any) {
-
     const candidateInfo = {
-      hrId:"685843dc5af72037a2beb9d4",
+      hrId: "685843dc5af72037a2beb9d4",
       candidateEmail: candidate.email,
       candidateName: candidate.name,
       interviewType: "ai"
     }
-    this.http.post(`${environment.NODE_BASE_URL}/interview/invite`,  candidateInfo, { withCredentials: true} )
-          .subscribe({
-            next: (response: any) => {
-              console.log('Search response:', response);
-            },
-            error: (error) => {
-              console.error('Search error:', error);
-            },
-            complete: () => {
-              this.isLoading = false;
-              this.searchResultsService.setLoading(false);
-            }
-          });
-          
-    this.searchResultsService.updateCandidateStatus(candidate.id, 'invited');
+    
+    this.http.post(`${environment.NODE_BASE_URL}/interview/invite`, candidateInfo, { withCredentials: true })
+      .subscribe({
+        next: (response: any) => {
+        
+          this.searchResultsService.updateCandidateStatus(candidate.id, 'invited');
+        },
+        error: (error) => {
+          console.error('Invite error:', error);
+        }
+      });
   }
 
   rejectCandidate(candidate: any) {
     const candidateInfo = {
-      hrId:"685843dc5af72037a2beb9d4",
-      candidateEmail: candidate.email,
+      hrId: "685843dc5af72037a2beb9d4",
+      candidateEmail: candidate.email ? candidate.email  : 'ankitnarang255@gmail.com',
       candidateName: candidate.name,
       interviewType: "ai"
     }
-    this.http.post(`${environment.NODE_BASE_URL}/interview/reject`,  candidateInfo, { withCredentials: true} )
-          .subscribe({
-            next: (response: any) => {
-              console.log('Search response:', response);
-            },
-            error: (error) => {
-              console.error('Search error:', error);
-            },
-            complete: () => {
-              this.isLoading = false;
-              this.searchResultsService.setLoading(false);
-            }
-          });
-          
-    this.searchResultsService.updateCandidateStatus(candidate.id, 'rejected');
+    
+    this.http.post(`${environment.NODE_BASE_URL}/interview/reject`, candidateInfo, { withCredentials: true })
+      .subscribe({
+        next: (response: any) => {
+          this.searchResultsService.updateCandidateStatus(candidate.id, 'rejected');
+        },
+        error: (error) => {
+          console.error('Reject error:', error);
+        }
+      });
   }
 }

@@ -17,17 +17,9 @@ export class AppComponent {
   constructor(
     private authService: AuthService
   ){
-    this.checkAuth();
   }
 
-  checkAuth() {
-    this.authService.checkAuthStatus()
-    .subscribe((response) => {
-      console.log("response", response);
-      
-    })
 
-  }
   onSidebarToggle() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }

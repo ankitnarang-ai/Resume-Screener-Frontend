@@ -146,8 +146,10 @@ export class AskQuestionComponent {
 
     this.isLoading = true;
     
+    // Create search result with unique ID
+    const searchResultId = this.generateId();
     const searchResult: SearchResult = {
-      id: this.generateId(),
+      id: searchResultId,
       query: this.jobDescription,
       matchType: this.matchType,
       timestamp: new Date(),
@@ -157,24 +159,41 @@ export class AskQuestionComponent {
     // Set loading state in service
     this.searchResultsService.setLoading(true);
     
-    // Add to service and navigate to results
+    // Add empty result to service first
     this.searchResultsService.addResult(searchResult);
+    
+    // Navigate to results page
     this.router.navigate(['/results']);
 
     const question = `Find ${this.matchType} matches for the following job description:\n\n${this.jobDescription}`;
 
+    // Make API call
     this.http.post(`${environment.BASE_URL}/ask`, { question })
       .subscribe({
         next: (response: any) => {
+          
           const candidates = this.parseResponse(response.answer);
-          searchResult.candidates = candidates;
-          this.searchResultsService.updateResult(searchResult);
+          
+          // Update the specific search result with candidates
+          const updatedResult: SearchResult = {
+            ...searchResult,
+            candidates: candidates
+          };
+          
+          // Update the result in the service
+          this.searchResultsService.updateResult(updatedResult);
           this.searchResultsService.setStats(`${candidates.length} candidates analyzed`);
         },
         error: (error) => {
           console.error('Search error:', error);
-          searchResult.candidates = [];
-          this.searchResultsService.updateResult(searchResult);
+          
+          // Update with empty candidates on error
+          const errorResult: SearchResult = {
+            ...searchResult,
+            candidates: []
+          };
+          
+          this.searchResultsService.updateResult(errorResult);
           this.searchResultsService.setStats('Search failed - please try again');
         },
         complete: () => {
@@ -185,35 +204,89 @@ export class AskQuestionComponent {
   }
 
   private parseResponse(answer: string): Candidate[] {
-    
+   
     const candidates: Candidate[] = [];
+    
+    // Handle different possible response formats
     const lines = answer.split('\n').filter(line => line.trim());
     
-    lines.forEach(line => {
+    lines.forEach((line, index) => {
       const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('- Strong Match:') || trimmedLine.startsWith('- Moderate Match:')) {
-        const isStrongMatch = trimmedLine.startsWith('- Strong Match:');
-        const matchType = isStrongMatch ? 'strong' : 'moderate';
-        const content = trimmedLine.replace(/- (Strong|Moderate) Match:\s*/, '');
-        const parts = content.split(' | ');
+      
+      // Check for different possible formats
+      let isMatch = false;
+      let matchType: 'strong' | 'moderate' = 'moderate';
+      let content = '';
+      
+      if (trimmedLine.startsWith('- Strong Match:')) {
+        isMatch = true;
+        matchType = 'strong';
+        content = trimmedLine.replace(/^- Strong Match:\s*/, '');
+      } else if (trimmedLine.startsWith('- Moderate Match:')) {
+        isMatch = true;
+        matchType = 'moderate';
+        content = trimmedLine.replace(/^- Moderate Match:\s*/, '');
+      } else if (trimmedLine.startsWith('Strong Match:')) {
+        isMatch = true;
+        matchType = 'strong';
+        content = trimmedLine.replace(/^Strong Match:\s*/, '');
+      } else if (trimmedLine.startsWith('Moderate Match:')) {
+        isMatch = true;
+        matchType = 'moderate';
+        content = trimmedLine.replace(/^Moderate Match:\s*/, '');
+      } else if (trimmedLine.includes('|') && (trimmedLine.includes('.pdf') || trimmedLine.includes('.doc'))) {
+        // Fallback: if line contains pipe and file extension, assume it's a candidate
+        isMatch = true;
+        matchType = 'moderate'; // default
+        content = trimmedLine;
+      }
+      
+      if (isMatch && content) {
+       
+        // Split by pipe or other delimiters
+        let parts = content.split('|').map(p => p.trim());
+        
+        // If no pipe, try other delimiters
+        if (parts.length === 1) {
+          parts = content.split('-').map(p => p.trim());
+        }
+        if (parts.length === 1) {
+          parts = content.split(',').map(p => p.trim());
+        }
         
         if (parts.length >= 2) {
           const name = parts[0].trim();
           const filename = parts[1].trim();
-          const email = parts[2]?.trim();
+          const email = parts[2]?.trim() || '';
           
-          candidates.push({
+          if (name && filename) {
+            const candidate: Candidate = {
+              id: this.generateId(),
+              name,
+              filename,
+              email,
+              matchType,
+              status: 'pending'
+            };
+            
+            candidates.push(candidate);
+          }
+        } else if (parts.length === 1 && parts[0]) {
+          // Single part - assume it's name, create dummy filename
+          const candidate: Candidate = {
             id: this.generateId(),
-            name,
-            filename,
-            email: email || '',
+            name: parts[0],
+            filename: 'resume.pdf',
+            email: '',
             matchType,
             status: 'pending'
-          });
+          };
+          
+          candidates.push(candidate);
         }
       }
     });
-    
+  
     return candidates;
   }
 
@@ -224,6 +297,6 @@ export class AskQuestionComponent {
   }
 
   private generateId(): string {
-    return Math.random().toString(36).substring(2, 15);
+    return Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
   }
 }

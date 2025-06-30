@@ -73,7 +73,6 @@ export class AuthService {
         if (response.user) {
           this.currentUserSubject.next(response.user);
         }
-        console.log('Traditional login successful:', response.message);
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Traditional login failed:', error);
@@ -100,7 +99,6 @@ export class AuthService {
         if (response.user) {
           this.currentUserSubject.next(response.user);
         }
-        console.log('Google login successful:', response.message);
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Google login failed:', error);
@@ -123,7 +121,6 @@ export class AuthService {
       tap(response => {
         // Clear user state on logout
         this.currentUserSubject.next(null);
-        console.log('Logout successful:', response.message);
       }),
       catchError((error: HttpErrorResponse) => {
         console.error('Logout failed:', error);
