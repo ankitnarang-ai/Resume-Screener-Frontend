@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, NgZone, OnInit, Inject, PLATFORM_ID, Input, Output, EventEmitter } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../../services/auth/auth.service';
 import { Router } from '@angular/router';
@@ -25,6 +25,10 @@ export class GoogleSignInComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+
+  @Input() mode: 'login' | 'signup' = 'login';
+  @Output() signupSuccess = new EventEmitter<any>();
+  @Output() signupError = new EventEmitter<any>();
 
   constructor(
     private authService: AuthService,
@@ -68,8 +72,8 @@ export class GoogleSignInComponent implements OnInit {
           {
             theme: 'outline',
             size: 'large',
-            width: 300,
-            text: 'continue_with',
+            width: button.offsetWidth || 280, 
+            text: this.mode === 'signup' ? 'signup_with' : 'continue_with',
             shape: 'rectangle',
             type: 'standard',
             logo_alignment: 'left',
@@ -88,21 +92,56 @@ export class GoogleSignInComponent implements OnInit {
         this.isLoading = true;
         const idToken = response.credential;
 
-        this.authService.loginWithGoogle(idToken).subscribe({
-          next: (authResponse) => {
-            this.isLoading = false;
-            this.successMessage = 'Google login successful! Redirecting...';
-            setTimeout(() => {
-              this.router.navigate(['/dashboard']);
-            }, 1000);
-          },
-          error: (error) => {
-            this.isLoading = false;
-            this.errorMessage = error.error?.message || 'Google login failed. Please try again.';
-          }
-        });
+        if (this.mode === 'signup') {
+          this.handleGoogleSignup(idToken);
+        } else {
+          this.handleGoogleLogin(idToken);
+        }
       } else {
         this.errorMessage = 'Google sign-in was cancelled or failed.';
+        if (this.mode === 'signup') {
+          this.signupError.emit(this.errorMessage);
+        }
+      }
+    });
+  }
+
+  private handleGoogleSignup(idToken: string): void {
+    this.authService.loginWithGoogle(idToken).subscribe({
+      next: (authResponse) => {
+        this.isLoading = false;
+        this.successMessage = 'Google signup successful! Redirecting to role selection...';
+        console.log("authresponse", authResponse);
+        
+        this.signupSuccess.emit(authResponse);
+        setTimeout(() => {
+          this.router.navigate(['/role-selection'], {
+            queryParams: {
+              id: authResponse.user.id
+            }
+          });
+        }, 1000);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.error?.message || 'Google signup failed. Please try again.';
+        this.signupError.emit(this.errorMessage);
+      }
+    });
+  }
+
+  private handleGoogleLogin(idToken: string): void {
+    this.authService.loginWithGoogle(idToken).subscribe({
+      next: (authResponse) => {
+        this.isLoading = false;
+        this.successMessage = 'Google login successful! Redirecting...';
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 1000);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error.error?.message || 'Google login failed. Please try again.';
       }
     });
   }
