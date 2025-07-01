@@ -1,41 +1,43 @@
-// signup.component.ts
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, Inject, ViewChild, ViewContainerRef, ComponentRef } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PLATFORM_ID } from '@angular/core';
+
 import { AuthService } from '../../../services/auth/auth.service';
 import { CommonInputComponent } from '../../../shared/common-input/common-input.component';
 import { CommonSelectComponent, SelectOption } from '../../../shared/common-select/common-select.component';
-import { FormControl } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { GoogleSignInComponent } from '../google-sign-in/google-sign-in.component';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     ReactiveFormsModule,
     CommonInputComponent,
     CommonSelectComponent,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatCardModule,
-    MatSnackBarModule,
-    GoogleSignInComponent
+    MatSnackBarModule
   ],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
 })
 export class SignupComponent {
+  @ViewChild('googleSignInContainer', { read: ViewContainerRef }) googleSignInContainer!: ViewContainerRef;
+  
   signupForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  
+  isBrowser = false;
+  googleSignInComponentRef: ComponentRef<any> | null = null;
+
   roles: SelectOption[] = [
     { value: 'candidate', label: 'Candidate' },
     { value: 'hr', label: 'Human Resource' }
@@ -45,8 +47,11 @@ export class SignupComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+
     this.signupForm = this.fb.group({
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
@@ -54,13 +59,33 @@ export class SignupComponent {
       role: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
+    }, {
+      validators: this.passwordMatchValidator
+    });
+  }
+
+  async ngAfterViewInit() {
+    // Only load Google Sign-In component in browser
+    if (this.isBrowser && this.googleSignInContainer) {
+      try {
+        const { GoogleSignInComponent } = await import('../google-sign-in/google-sign-in.component');
+        this.googleSignInComponentRef = this.googleSignInContainer.createComponent(GoogleSignInComponent);
+      } catch (error) {
+        console.warn('Failed to load Google Sign-In component:', error);
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.googleSignInComponentRef) {
+      this.googleSignInComponentRef.destroy();
+    }
   }
 
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
-    
+
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
     } else if (confirmPassword?.errors?.['passwordMismatch']) {
@@ -84,10 +109,15 @@ export class SignupComponent {
         next: (response) => {
           this.isLoading = false;
           this.successMessage = response.message;
-          this.snackBar.open('Account created successfully!', 'Close', {
-            duration: 3000,
-            panelClass: ['success-snackbar']
-          });
+          
+          // Only show snackbar in browser
+          if (this.isBrowser) {
+            this.snackBar.open('Account created successfully!', 'Close', {
+              duration: 3000,
+              panelClass: ['success-snackbar']
+            });
+          }
+          
           setTimeout(() => {
             this.router.navigate(['/login']);
           }, 2000);
@@ -95,10 +125,14 @@ export class SignupComponent {
         error: (error) => {
           this.isLoading = false;
           this.errorMessage = error.error?.message || 'Signup failed. Please try again.';
-          this.snackBar.open(this.errorMessage, 'Close', {
-            duration: 5000,
-            panelClass: ['error-snackbar']
-          });
+          
+          // Only show snackbar in browser
+          if (this.isBrowser) {
+            this.snackBar.open(this.errorMessage, 'Close', {
+              duration: 5000,
+              panelClass: ['error-snackbar']
+            });
+          }
         }
       });
     } else {
