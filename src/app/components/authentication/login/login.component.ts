@@ -1,34 +1,59 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Inject, ViewChild, ViewContainerRef, ComponentRef } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PLATFORM_ID } from '@angular/core';
 import { AuthService } from '../../../services/auth/auth.service';
 import { CommonInputComponent } from '../../../shared/common-input/common-input.component';
-import { GoogleSignInComponent } from '../google-sign-in/google-sign-in.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CommonInputComponent, GoogleSignInComponent],
+  imports: [CommonModule, ReactiveFormsModule, CommonInputComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
+  @ViewChild('googleSignInContainer', { read: ViewContainerRef }) googleSignInContainer!: ViewContainerRef;
+  
   loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
   successMessage = '';
+  isBrowser = false;
+  googleSignInComponentRef: ComponentRef<any> | null = null;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false]
     });
+  }
+
+  async ngAfterViewInit() {
+    // Only load Google Sign-In component in browser
+    if (this.isBrowser && this.googleSignInContainer) {
+      try {
+        const { GoogleSignInComponent } = await import('../google-sign-in/google-sign-in.component');
+        this.googleSignInComponentRef = this.googleSignInContainer.createComponent(GoogleSignInComponent);
+      } catch (error) {
+        console.warn('Failed to load Google Sign-In component:', error);
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.googleSignInComponentRef) {
+      this.googleSignInComponentRef.destroy();
+    }
   }
 
   getFormControl(name: string): FormControl | null {
@@ -37,8 +62,11 @@ export class LoginComponent {
 
   private getReturnUrl(): string {
     // Get return URL from query params or default to dashboard
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('returnUrl') || '/dashboard';
+    if (this.isBrowser) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('returnUrl') || '/dashboard';
+    }
+    return '/dashboard';
   }
 
   onSubmit(): void {
@@ -55,9 +83,7 @@ export class LoginComponent {
           // Check for returnUrl in query params
           const returnUrl = this.getReturnUrl();
           
-    
-            this.router.navigate([returnUrl]);
-          
+          this.router.navigate([returnUrl]);
         },
         error: (error) => {
           this.isLoading = false;
