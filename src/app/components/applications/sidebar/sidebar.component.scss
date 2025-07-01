@@ -11,14 +11,30 @@
 
   &-collapsed {
     width: 60px;
+    
+    // Only hide text and arrows, but keep icons visible
     .sidebar-item-text, 
     .sidebar-item-arrow {
       display: none;
     }
+    
+    // Keep logo text hidden but not the icon
+    .logo-text {
+      display: none;
+    }
+    
     .sidebar-logo {
       justify-content: center; /* Center logo when collapsed */
       mat-icon {
         margin-right: 0; /* Remove margin when collapsed */
+      }
+    }
+    
+    // Center the menu item icons when collapsed
+    .sidebar-item {
+      justify-content: center;
+      mat-icon {
+        margin-right: 0;
       }
     }
   }
@@ -37,11 +53,22 @@
     font-size: 1.2rem;
     display: flex;
     align-items: center;
+    cursor: pointer; /* Add cursor pointer to indicate clickable */
+    transition: color 0.2s ease; /* Smooth color transition */
+
+    &:hover {
+      color: #3182ce; /* Change color on hover for visual feedback */
+    }
 
     mat-icon {
       font-size: 24px;
       color: #2d3748; /* Ensure logo icon color */
       margin-right: 8px; /* Default margin */
+      transition: color 0.2s ease; /* Smooth icon color transition */
+    }
+
+    &:hover mat-icon {
+      color: #3182ce; /* Change icon color on hover */
     }
   }
 
@@ -140,6 +167,7 @@
     font-size: 20px;
     vertical-align: middle;
     color: #718096;
+    flex-shrink: 0; /* Prevent icons from shrinking */
   }
 
   .sidebar-item:hover mat-icon {
@@ -175,7 +203,7 @@
     height: 100vh;
     left: 0;
     top: 0;
-    width: 100%; /* Full width on mobile when open */
+    width: 250px; /* Fixed width instead of 100% for better UX */
     transform: translateX(-100%); /* Initially hidden off-screen */
     box-shadow: none; /* Remove box-shadow */
     border-right: none; /* Remove border-right */
@@ -186,6 +214,33 @@
     &:not(.sidebar-collapsed) {
       transform: translateX(0); /* Slide in from left to be fully visible */
       box-shadow: 2px 0 10px rgba(0,0,0,0.2); /* Add shadow for open state */
+    }
+    
+    // On mobile, always show full sidebar (never collapsed state)
+    // Override collapsed styles for mobile
+    &.sidebar-collapsed {
+      width: 250px; /* Full width even when "collapsed" on mobile */
+      transform: translateX(-100%); /* Hide it off-screen instead of collapsing */
+      
+      .sidebar-item-text, 
+      .sidebar-item-arrow,
+      .logo-text {
+        display: block; /* Show all text on mobile */
+      }
+      
+      .sidebar-logo {
+        justify-content: flex-start; /* Align left on mobile */
+        mat-icon {
+          margin-right: 8px; /* Restore margin on mobile */
+        }
+      }
+      
+      .sidebar-item {
+        justify-content: flex-start; /* Align left on mobile */
+        mat-icon {
+          margin-right: 8px; /* Restore margin on mobile */
+        }
+      }
     }
     
     .sidebar-header {
@@ -199,14 +254,6 @@
     }
     .sidebar-submenu .sidebar-subitem {
       padding-left: 30px; /* Adjust for mobile */
-    }
-    
-    // Adjust logo icon behavior for mobile when collapsed/hidden
-    .sidebar-logo {
-      justify-content: flex-start; /* Align logo text/icon left */
-      mat-icon {
-        margin-right: 8px; /* Ensure margin for menu icon */
-      }
     }
   }
 }
