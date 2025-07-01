@@ -1,11 +1,12 @@
 <div class="sidebar" [ngClass]="{ 'sidebar-collapsed': isSidebarCollapsed }">
   <div class="sidebar-header">
-    <a href="javascript:void(0);" class="sidebar-logo">
+    <a href="javascript:void(0);" class="sidebar-logo" (click)="toggleSidebar()">
       @if (isSidebarCollapsed) {
-        <mat-icon>menu</mat-icon> <!-- Changed to 'menu' icon for collapsed state -->
+        <mat-icon>menu</mat-icon> <!-- Menu icon when collapsed -->
       } @else {
-        Smart Hire
+        <mat-icon>business</mat-icon> <!-- Your logo icon when expanded -->
       }
+      <span class="logo-text">Smart Hire</span>
     </a>
   </div>
   

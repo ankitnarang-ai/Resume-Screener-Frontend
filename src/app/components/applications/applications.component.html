@@ -1,7 +1,25 @@
+<!-- Mobile Header (only visible on mobile) -->
+<div class="mobile-header">
+  <button class="mobile-toggle-btn" (click)="onSidebarToggle()" type="button">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <div class="mobile-header-title">Smart Hire</div>
+</div>
+
 <div class="app-container">
   <div class="position-relative">
     <!-- Sidebar -->
-    <app-sidebar></app-sidebar>
+    <app-sidebar 
+      [isSidebarCollapsed]="isSidebarCollapsed" 
+      (sidebarToggle)="onSidebarToggle()">
+    </app-sidebar>
+  </div>
+
+  <!-- Mobile overlay to close sidebar when clicking outside -->
+  <div 
+    class="mobile-sidebar-overlay" 
+    [class.active]="!isSidebarCollapsed"
+    (click)="closeSidebarOnMobile()">
   </div>
 
   <!-- Main Content -->

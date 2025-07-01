@@ -1,3 +1,63 @@
+// Mobile Header Styles
+.mobile-header {
+  display: none; /* Hidden by default on desktop */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  z-index: 1001; /* Higher than sidebar */
+  padding: 0 15px;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  .mobile-toggle-btn {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background-color: #f7fafc;
+    }
+
+    mat-icon {
+      font-size: 24px;
+      color: #2d3748;
+    }
+  }
+
+  .mobile-header-title {
+    margin-left: 15px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #2d3748;
+  }
+}
+
+// Mobile Overlay
+.mobile-sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999; /* Below sidebar but above content */
+  
+  &.active {
+    display: block;
+  }
+}
+
 .app-container {
   display: flex;
   height: 100vh;
@@ -27,6 +87,11 @@
   height: 100vh;
   overflow: scroll;
   max-width: 100%;
+  transition: margin-left 0.3s ease;
+
+  // &.content-expanded {
+  //   // Add any styles for when sidebar is collapsed
+  // }
 }
 
 .chat-header {
@@ -67,10 +132,32 @@
   }
 }
 
-// Responsive
+// Desktop styles
+@media (min-width: 769px) {
+  
+  .mobile-sidebar-overlay {
+    display: none !important; /* Never show overlay on desktop */
+  }
+}
+
+// Mobile Responsiveness
 @media (max-width: 768px) {
+  .mobile-header {
+    display: flex; /* Show mobile header on mobile */
+  }
+
   .app-container {
-    flex-direction: column;
+    flex-direction: row; /* Keep flex row for sidebar positioning */
+    padding-top: 60px; /* Account for fixed mobile header */
+  }
+  
+  .main-content {
+    margin-left: 0; /* No left margin on mobile */
+    margin-top: 0; /* Mobile header creates the top spacing */
+    
+    &.content-expanded {
+      margin-left: 0; /* Still no left margin when sidebar is collapsed on mobile */
+    }
   }
   
   .sidebar {
@@ -84,5 +171,13 @@
   .chat-header,
   .input-area {
     padding: 1rem;
+  }
+
+  .mobile-sidebar-overlay {
+    top: 60px; /* Account for mobile header */
+    
+    &.active {
+      display: block;
+    }
   }
 }
