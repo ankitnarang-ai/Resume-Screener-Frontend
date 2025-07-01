@@ -48,6 +48,9 @@
         overflow-y: auto;
       }
 
+      mat-card-header {
+        padding: 0;
+      }
       form {
         display: flex;
         flex-direction: column;

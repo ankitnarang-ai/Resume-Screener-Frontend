@@ -108,6 +108,14 @@ export class AuthService {
     );
   }
 
+  updateUserRole(userId: string, role: string): Observable<any> {
+    console.log("userId-----", userId);
+    
+    return this.httpClient.put(`${environment.NODE_BASE_URL}/user/role`, { userId, role }, {
+      withCredentials: true
+    });
+  }
+
   signup(credentials: SignupRequest): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(`${environment.NODE_BASE_URL}/authentication/public/signup`, credentials, {
       withCredentials: true

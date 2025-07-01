@@ -22,6 +22,11 @@ export const routes: Routes = [
     component: SignupComponent,
     canActivate: [GuestGuard] // Prevent authenticated users from accessing signup
   },
+  {
+    path: 'role-selection',
+    loadComponent: () => import('./components/authentication/role-selection/role-selection.component')
+      .then(m => m.RoleSelectionComponent)
+  },
   
   // Protected Application Routes
   // These routes require authentication and use the ApplicationsComponent as a layout

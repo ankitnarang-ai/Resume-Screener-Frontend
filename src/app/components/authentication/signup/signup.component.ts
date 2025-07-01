@@ -6,7 +6,6 @@ import { PLATFORM_ID } from '@angular/core';
 
 import { AuthService } from '../../../services/auth/auth.service';
 import { CommonInputComponent } from '../../../shared/common-input/common-input.component';
-import { CommonSelectComponent, SelectOption } from '../../../shared/common-select/common-select.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -19,7 +18,6 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
     CommonModule,
     ReactiveFormsModule,
     CommonInputComponent,
-    CommonSelectComponent,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatCardModule,
@@ -38,11 +36,6 @@ export class SignupComponent {
   isBrowser = false;
   googleSignInComponentRef: ComponentRef<any> | null = null;
 
-  roles: SelectOption[] = [
-    { value: 'candidate', label: 'Candidate' },
-    { value: 'hr', label: 'Human Resource' }
-  ];
-
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -52,11 +45,11 @@ export class SignupComponent {
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
 
+    // Removed role field from form
     this.signupForm = this.fb.group({
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      role: ['', [Validators.required]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, {
@@ -64,17 +57,28 @@ export class SignupComponent {
     });
   }
 
-  async ngAfterViewInit() {
-    // Only load Google Sign-In component in browser
-    if (this.isBrowser && this.googleSignInContainer) {
-      try {
-        const { GoogleSignInComponent } = await import('../google-sign-in/google-sign-in.component');
-        this.googleSignInComponentRef = this.googleSignInContainer.createComponent(GoogleSignInComponent);
-      } catch (error) {
-        console.warn('Failed to load Google Sign-In component:', error);
-      }
+  // In the ngAfterViewInit method of SignupComponent
+async ngAfterViewInit() {
+  // Only load Google Sign-In component in browser
+  if (this.isBrowser && this.googleSignInContainer) {
+    try {
+      const { GoogleSignInComponent } = await import('../google-sign-in/google-sign-in.component');
+      this.googleSignInComponentRef = this.googleSignInContainer.createComponent(GoogleSignInComponent);
+      this.googleSignInComponentRef.instance.mode = 'signup';
+      this.googleSignInComponentRef.instance.signupSuccess.subscribe((response: any) => {
+        // Handle successful signup (if needed)
+      });
+      this.googleSignInComponentRef.instance.signupError.subscribe((error: any) => {
+        this.snackBar.open(error, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+      });
+    } catch (error) {
+      console.warn('Failed to load Google Sign-In component:', error);
     }
   }
+}
 
   ngOnDestroy() {
     if (this.googleSignInComponentRef) {
@@ -109,6 +113,7 @@ export class SignupComponent {
         next: (response) => {
           this.isLoading = false;
           this.successMessage = response.message;
+          console.log("response", response);
           
           // Only show snackbar in browser
           if (this.isBrowser) {
@@ -118,8 +123,11 @@ export class SignupComponent {
             });
           }
           
+          // Navigate to role selection page instead of login
           setTimeout(() => {
-            this.router.navigate(['/login']);
+            this.router.navigate(['/role-selection'], { 
+              queryParams: { id: response.user._id } // Pass user ID if available
+            });
           }, 2000);
         },
         error: (error) => {
