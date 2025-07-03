@@ -68,7 +68,10 @@ export class UploadPdfComponent {
     const formData = new FormData();
     this.selectedFiles.forEach(file => formData.append('files', file));
 
-    this.http.post(`${environment.BASE_URL}/upload-and-process`, formData)
+    // this.http.post(`${environment.BASE_URL}/upload-and-process`, formData)
+     this.http.post(`${environment.NODE_BASE_URL}/resume/upload-process`, formData, {
+      withCredentials: true,
+     })
       .subscribe({
         next: () => {
           this.uploadStatus = 'Success! Resumes analyzed successfully.';

@@ -83,8 +83,8 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   }
 
   inviteCandidate(candidate: any) {
+    
     const candidateInfo = {
-      hrId: "685843dc5af72037a2beb9d4",
       candidateEmail: candidate.email,
       candidateName: candidate.name,
       interviewType: "ai"
