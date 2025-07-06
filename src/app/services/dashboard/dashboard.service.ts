@@ -9,7 +9,7 @@ export class DashboardService {
   constructor(private httpClient: HttpClient) {}
 
   getAnalytics(): Observable<any> {
-      return this.httpClient.get('http://localhost:3000/resume/analytics', {
+      return this.httpClient.get(`${environment.NODE_BASE_URL}/resume/analytics`, {
         withCredentials: true
       });
     }

@@ -8,6 +8,12 @@
   display: flex;
   flex-direction: column;
 
+  .sidebar-header {
+    .logo-img {
+      height: 4rem;
+    }
+  }
+
   &-collapsed {
     width: 60px;
     
