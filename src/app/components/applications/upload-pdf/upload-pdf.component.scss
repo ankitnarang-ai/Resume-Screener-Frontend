@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(to right, #f9fafb, #e3eaf6);
+  background: linear-gradient(to right, #f8fafc, #e1e7f5);
   padding: 2rem;
 
   .upload-box {
@@ -20,28 +20,33 @@
     h2 {
       font-size: 1.6rem;
       font-weight: 600;
-      color: #2c3e50;
+      color: #1e293b;
       margin-bottom: 0.25rem;
     }
 
     .subtitle {
       font-size: 1rem;
-      color: #555;
+      color: #64748b;
       margin-bottom: 1rem;
     }
 
     .drop-area {
-      border: 2px dashed #007bff;
+      border: 2px dashed #2563eb;
       border-radius: 12px;
       padding: 2rem;
       text-align: center;
       cursor: pointer;
-      background-color: #f0f4f8;
-      transition: background-color 0.3s ease;
+      background-color: #f8fafc;
+      transition: all 0.3s ease;
 
       &.active {
-        background-color: #e0f0ff;
-        border-color: #0056b3;
+        background-color: #eff6ff;
+        border-color: #1d4ed8;
+      }
+
+      &:hover {
+        background-color: #eff6ff;
+        border-color: #1d4ed8;
       }
 
       .upload-icon-container {
@@ -52,110 +57,112 @@
 
         .upload-icon {
           font-size: 1.5rem;
-          color: #007bff;
+          color: #2563eb;
         }
       }
 
       p {
         font-weight: 500;
-        color: #333;
+        color: #1e293b;
         margin: 0;
       }
 
       small {
-        color: #666;
+        color: #64748b;
       }
     }
 
     .files-list {
-  .files-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: 500;
-    color: #444;
-    margin-bottom: 0.75rem;
+      .files-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.75rem;
 
-    button {
-      background: none;
-      border: none;
-      color: #dc3545;
-      font-size: 0.9rem;
-      cursor: pointer;
+        button {
+          background: none;
+          border: none;
+          color: #dc2626;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: color 0.2s ease;
 
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  .files-container {
-    max-height: 200px; // adjust as needed
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding-right: 0.5rem;
-
-    // Optional: add custom scrollbar styling
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: #ccc;
-      border-radius: 3px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    .file-item {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 0.75rem 1rem;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
-
-      mat-icon {
-        color: #007bff;
-      }
-
-      .file-info {
-        flex: 1;
-
-        .file-name {
-          font-weight: 500;
-          color: #333;
-        }
-
-        .file-size {
-          font-size: 0.85rem;
-          color: #777;
+          &:hover {
+            color: #b91c1c;
+            text-decoration: underline;
+          }
         }
       }
 
-      .remove-btn {
-        background: none;
-        border: none;
-        color: #dc3545;
-        cursor: pointer;
+      .files-container {
+        max-height: 200px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding-right: 0.5rem;
 
-        mat-icon {
-          font-size: 20px;
+        &::-webkit-scrollbar {
+          width: 6px;
         }
 
-        &:hover {
-          color: #a71d2a;
+        &::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 3px;
+        }
+
+        &::-webkit-scrollbar-track {
+          background: #f1f5f9;
+        }
+
+        .file-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.75rem 1rem;
+          background-color: #f8fafc;
+          border-radius: 8px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          border: 1px solid #e2e8f0;
+
+          mat-icon {
+            color: #2563eb;
+          }
+
+          .file-info {
+            flex: 1;
+
+            .file-name {
+              font-weight: 500;
+              color: #1e293b;
+            }
+
+            .file-size {
+              font-size: 0.85rem;
+              color: #64748b;
+            }
+          }
+
+          .remove-btn {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            transition: color 0.2s ease;
+
+            mat-icon {
+              font-size: 20px;
+            }
+
+            &:hover {
+              color: #b91c1c;
+            }
+          }
         }
       }
     }
-  }
-}
-
 
     .action-area {
       display: flex;
@@ -165,7 +172,7 @@
       margin-top: 1.5rem;
 
       .upload-btn {
-        background-color: #007bff;
+        background-color: #2563eb;
         color: white;
         padding: 0.75rem 1.5rem;
         font-size: 1rem;
@@ -181,11 +188,11 @@
         gap: 0.5rem;
 
         &:hover:not(:disabled) {
-          background-color: #0056b3;
+          background-color: #1d4ed8;
         }
 
         &:disabled {
-          background-color: #6c757d;
+          background-color: #6b7280;
           cursor: not-allowed;
         }
 
@@ -205,10 +212,10 @@
         gap: 0.5rem;
         font-size: 0.95rem;
         font-weight: 500;
-        color: #dc3545;
+        color: #dc2626;
 
         &.success {
-          color: #28a745;
+          color: #16a34a;
         }
 
         mat-icon {
