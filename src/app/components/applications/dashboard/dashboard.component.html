@@ -19,7 +19,7 @@
                 <p>Streamline your hiring process with intelligent resume analysis, candidate matching, and automated interviews. Transform the way you discover and connect with top talent.</p>
                 <div class="hero-actions">
                     <button class="btn btn-white" (click)="goToResume()"><mat-icon aria-hidden="false" aria-label="upload" fontIcon="cloud_upload"></mat-icon>Upload Resumes</button>
-                    <button class="btn btn-outline" (click)="refreshData()"><mat-icon aria-hidden="false" aria-label="trending_up" fontIcon="trending_up"></mat-icon> View Analytics</button>
+                    <button class="btn btn-outline" (click)="viewAnalytics()"><mat-icon aria-hidden="false" aria-label="trending_up" fontIcon="trending_up"></mat-icon> View Analytics</button>
                 </div>
             </div>
         </div>
@@ -78,115 +78,6 @@
             </div>
         </div>
 
-        <!-- Analytics Dashboard -->
-        <div class="analytics-section">
-            <div class="analytics-header">
-                <h3>Analytics Dashboard</h3>
-                <button class="btn btn-secondary" (click)="refreshData()"><mat-icon aria-hidden="false" aria-label="refresh" fontIcon="refresh"></mat-icon> Refresh Data</button>
-            </div>
-
-            <div class="metrics-grid">
-                <div class="metric-card" (click)="goToResume()">
-                    <div class="metric-header">
-                        <div>
-                            <div class="metric-value">{{ totalResumesAnalyzed }}</div>
-                            <div class="metric-label">Total Resumes</div>
-                            <div class="metric-change positive">{{ totalResumesAnalyzed > 0 ? 'Active pipeline' : 'Ready to start' }}</div>
-                        </div>
-                        <div class="metric-icon"><mat-icon aria-hidden="false" aria-label="description" fontIcon="description"></mat-icon></div>
-                    </div>
-                </div>
-
-                <div class="metric-card" (click)="goToCandidates()">
-                    <div class="metric-header">
-                        <div>
-                            <div class="metric-value">{{ matchedCandidates }}</div>
-                            <div class="metric-label">Qualified Candidates</div>
-                            <div class="metric-change positive">{{ getMatchingRate() }}% match rate</div>
-                        </div>
-                        <div class="metric-icon"><mat-icon aria-hidden="false" aria-label="task_alt" fontIcon="task_alt"></mat-icon></div>
-                    </div>
-                </div>
-
-                <div class="metric-card" (click)="goToInterviews()">
-                    <div class="metric-header">
-                        <div>
-                            <div class="metric-value">{{ interviewInvitesSent }}</div>
-                            <div class="metric-label">Interview Invitations</div>
-                            <div class="metric-change neutral">{{ getInvitationRate() }}% of matches</div>
-                        </div>
-                        <div class="metric-icon"><mat-icon aria-hidden="false" aria-label="calendar_today" fontIcon="calendar_today"></mat-icon></div>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div>
-                            <div class="metric-value">{{ getTotalInterviews() }}</div>
-                            <div class="metric-label">Total Interviews</div>
-                            <div class="metric-change positive">{{ getInterviewConversionRate() }}% conversion rate</div>
-                        </div>
-                        <div class="metric-icon"><mat-icon aria-hidden="false" aria-label="insights" fontIcon="insights"></mat-icon></div>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div>
-                            <div class="metric-value">{{ aiInterviewsCompleted }}</div>
-                            <div class="metric-label">AI Interviews</div>
-                            <div class="metric-change neutral">{{ aiInterviewsCompleted > 0 ? 'Completed' : 'Ready to start' }}</div>
-                        </div>
-                        <div class="metric-icon"><mat-icon aria-hidden="false" aria-label="auto_mode" fontIcon="auto_mode"></mat-icon></div>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div>
-                            <div class="metric-value">{{ humanInterviewsCompleted }}</div>
-                            <div class="metric-label">Human Interviews</div>
-                            <div class="metric-change neutral">{{ humanInterviewsCompleted > 0 ? 'Completed' : 'Pending AI screening' }}</div>
-                        </div>
-                        <div class="metric-icon"><mat-icon aria-hidden="false" aria-label="person" fontIcon="person"></mat-icon></div>
-                    </div>
-                </div>
-
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <div>
-                            <div class="metric-value">{{ interviewRejections }}</div>
-                            <div class="metric-label">Interview Rejections</div>
-                            <div class="metric-change negative">{{ getRejectionRate() }}% rejection rate</div>
-                        </div>
-                        <div class="metric-icon"><mat-icon aria-hidden="false" aria-label="close" fontIcon="close"></mat-icon></div>
-                    </div>
-                </div>
-
-                <div class="metric-card" (click)="goToJobPostings()">
-                    <div class="metric-header">
-                        <div>
-                            <div class="metric-value">{{ getMatchingRate() }}%</div>
-                            <div class="metric-label">Overall Match Rate</div>
-                            <div class="metric-change positive">Quality matching</div>
-                        </div>
-                        <div class="metric-icon"><mat-icon aria-hidden="false" aria-label="track_changes" fontIcon="track_changes"></mat-icon></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Progress Section -->
-        <div class="progress-section">
-            <div class="progress-header">
-                <h4>Pipeline Progress</h4>
-                <div class="progress-bar">
-                    <div class="progress-fill" [style.width.%]="getPipelineProgress()"></div>
-                </div>
-                <p class="progress-text">{{ getPipelineProgress() }}% Complete - {{ getCurrentStageMessage() }}</p>
-            </div>
-        </div>
-
         <!-- Recent Activity Section -->
         <div class="recent-activity" *ngIf="recentActivities.length > 0">
             <div class="section-header">
@@ -211,7 +102,7 @@
             <div class="empty-icon">📋</div>
             <h3>No Recent Activity</h3>
             <p>Start uploading resumes to see activity here</p>
-            <button class="btn btn-primary" (click)="goToResume()">📄 Upload Resumes</button>
+            <button class="btn btn-primary" (click)="goToResume()"><mat-icon aria-hidden="false" aria-label="upload" fontIcon="cloud_upload"></mat-icon> Upload Resumes</button>
         </div>
     </div>
 

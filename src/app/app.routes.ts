@@ -9,6 +9,7 @@ import { SignupComponent } from './components/authentication/signup/signup.compo
 import { AuthGuard } from './guard/auth/auth.guard';
 import { AiInterviewComponent } from './components/applications/ai-interview/ai-interview.component';
 import { ApplicationsComponent } from './components/applications/applications.component';
+import { AnalyticsComponent } from './components/applications/analytics/analytics.component';
 
 export const routes: Routes = [
   // Authentication Routes
@@ -54,6 +55,11 @@ export const routes: Routes = [
       {
         path: 'results',
         component: SearchResultsComponent
+      },
+      {
+        path: 'analytics',
+        loadComponent: () => import('./components/applications/analytics/analytics.component')
+          .then(m => m.AnalyticsComponent)
       },
       {
         path: '', // Default child route for '' (e.g., when navigating to just '/')

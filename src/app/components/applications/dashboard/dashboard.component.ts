@@ -327,6 +327,10 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(["/upload"])
   }
 
+  viewAnalytics(): void {
+    this.router.navigate(["/analytics"])
+  }
+
   goToJobPostings(): void {
     this.router.navigate(["/job-postings"])
   }
