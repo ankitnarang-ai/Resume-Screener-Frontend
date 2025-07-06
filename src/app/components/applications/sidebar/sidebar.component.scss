@@ -2,12 +2,11 @@
   width: 250px;
   height: 100vh;
   background: #ffffff;
+  border-right: 1px solid #e4e4e4;
   color: #2d3748;
   transition: width 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  border-right: 1px solid #e2e8f0;
-  display: flex; /* Use flexbox for layout */
-  flex-direction: column; /* Stack items vertically */
+  display: flex;
+  flex-direction: column;
 
   &-collapsed {
     width: 60px;
@@ -25,57 +24,93 @@
     
     .sidebar-logo {
       justify-content: center; /* Center logo when collapsed */
+      padding: 0 10px; /* Add some padding for better spacing */
+      
       mat-icon {
         margin-right: 0; /* Remove margin when collapsed */
+        width: 40px; /* Maintain icon size */
+        height: 40px;
       }
     }
     
     // Center the menu item icons when collapsed
     .sidebar-item {
       justify-content: center;
+      padding: 12px 10px; /* Adjust padding for collapsed state */
+      
       mat-icon {
         margin-right: 0;
       }
     }
+
+    .sidebar-item:not(.menu-item-active):hover {
+      background: transparent; 
+      box-shadow: none; 
+    }
+
+    .sidebar-item.menu-item-active {
+      background:none; 
+      box-shadow: none;
+    }
+
+    .sidebar-item.menu-item-active mat-icon {
+      color: #2563eb; /* Keep active icon color */
+    }
+    
+    // Adjust header padding for collapsed state
+    .sidebar-header {
+      padding: 24px 10px;
+    }
+    
+    // Adjust footer padding for collapsed state
+    .sidebar-footer {
+      padding: 16px 10px;
+    }
   }
 
   &-header {
-    padding: 20px;
-    border-bottom: 1px solid #e2e8f0;
-    background-color: #ffffff;
-    flex-shrink: 0; /* Prevent header from shrinking */
+    padding: 24px 20px;
+    flex-shrink: 0;
   }
 
   &-logo {
-    color: #2d3748;
-    font-weight: bold;
+    color: #1a202c;
+    font-weight: 600;
     text-decoration: none;
-    font-size: 1.2rem;
+    font-size: 1.25rem;
     display: flex;
     align-items: center;
-    cursor: pointer; /* Add cursor pointer to indicate clickable */
-    transition: color 0.2s ease; /* Smooth color transition */
+    cursor: pointer;
+    transition: color 0.2s ease;
 
     &:hover {
-      color: #3182ce; /* Change color on hover for visual feedback */
+      color: #2563eb;
     }
 
     mat-icon {
-      font-size: 24px;
-      color: #2d3748; /* Ensure logo icon color */
-      margin-right: 8px; /* Default margin */
-      transition: color 0.2s ease; /* Smooth icon color transition */
+      font-size: 28px;
+      width: 40px;
+      height: 40px;
+      background: #2563eb;
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      transition: background-color 0.2s ease;
+      flex-shrink: 0;
     }
 
     &:hover mat-icon {
-      color: #3182ce; /* Change icon color on hover */
+      background: #1d4ed8;
     }
   }
 
   &-menu {
-    flex-grow: 1; /* Allow menu to take up available space */
-    padding: 10px 0;
-    overflow-y: auto; /* Enable scrolling for long menus */
+    flex-grow: 1;
+    padding: 0 16px;
+    overflow-y: auto;
     
     ul {
       padding: 0;
@@ -84,176 +119,172 @@
 
     &-item {
       list-style: none;
+      margin-bottom: 4px;
     }
   }
 
   &-item {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
-    color: #4a5568;
+    padding: 12px 16px;
+    color: #6b7280;
     text-decoration: none;
-    transition: all 0.3s ease;
-    border-radius: 0 25px 25px 0;
-    margin-right: 10px;
-    cursor: pointer; /* Indicate clickable */
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
 
     &:hover {
-      background: #ebf8ff;
-      color: #3182ce;
-      border-left: 4px solid #4299e1;
+      background: #ffffff;
+      color: #374151;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     &.menu-item-active {
-      background: #ebf8ff;
-      color: #3182ce;
-      border-left: 4px solid #4299e1;
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
 
       mat-icon {
-        color: #3182ce;
+        color: white;
       }
     }
 
     &-text {
-      margin-left: 10px;
+      margin-left: 12px;
       white-space: nowrap;
       font-weight: 500;
-      overflow: hidden; /* Hide text overflow when collapsed */
+      overflow: hidden;
+      font-size: 0.95rem;
     }
 
     &-arrow {
       margin-left: auto;
       transition: transform 0.3s ease;
-      color: #718096;
+      color: #9ca3af;
     }
   }
 
   &-submenu {
     padding: 0;
-    background: #f7fafc;
-    overflow: hidden; /* Hide overflow for smooth collapse */
+    background: transparent;
+    overflow: hidden;
     max-height: 0;
-    transition: max-height 0.3s ease-in-out; /* Smooth open/close */
+    transition: max-height 0.3s ease-in-out;
 
-    // This class should be applied to the <li> that contains the parent item and its submenu
-    // when the parent item's children are open
     .sidebar-menu-item-active & {
-      max-height: 500px; /* Adjust as needed to fit content of submenu */
+      max-height: 500px;
     }
 
     .sidebar-subitem {
-      padding-left: 40px;
-      color: #718096;
+      padding-left: 52px;
+      font-size: 0.9rem;
       
       &:hover {
-        background: #edf2f7;
-        color: #4a5568;
+        background: #ffffff;
+        color: #6b7280;
       }
 
       &.menu-item-active {
-        background: #edf2f7;
-        color: #3182ce;
-        border-left: 4px solid #4299e1;
+        background: #dbeafe;
+        color: #1d4ed8;
         
         mat-icon {
-          color: #3182ce;
+          color: #1d4ed8;
         }
       }
     }
   }
 
   mat-icon {
-    margin-right: 8px;
+    margin-right: 12px;
     font-size: 20px;
     vertical-align: middle;
-    color: #718096;
-    flex-shrink: 0; /* Prevent icons from shrinking */
-  }
-
-  .sidebar-item:hover mat-icon {
-    color: #3182ce;
+    flex-shrink: 0;
   }
 
   // Logout button styling
   &-footer {
-    border-top: 1px solid #e2e8f0;
-    padding: 10px 0;
-    flex-shrink: 0; /* Prevent footer from shrinking */
+    padding: 16px;
+    flex-shrink: 0;
 
     .logout-item {
-      color: #8b0d0d; /* A common red for error/danger */
+      color: #6b7280;
+      background: #ffffff;
+      border-radius: 8px;
+      margin-bottom: 0;
 
       &:hover {
-        background: #eeb4b4; /* Darker red on hover */
-        border-left-color: #8b0d0d; /* Darker red border for a cohesive look */
+        background: #fee2e2;
+        color: #dc2626;
       }
 
       mat-icon {
-        color: #8b0d0d; /* Match icon color to text */
+        color: #9ca3af;
       }
+      
       &:hover mat-icon {
-        color: #8b0d0d /* Match icon hover color to text hover */
+        color: #dc2626;
       }
     }
   }
 
   /* --- Mobile Responsiveness (Max-width 768px) --- */
   @media (max-width: 768px) {
-    position: fixed; /* Fixed position for sidebar on mobile */
+    position: fixed;
     height: 100vh;
     left: 0;
     top: 0;
-    width: 250px; /* Fixed width instead of 100% for better UX */
-    transform: translateX(-100%); /* Initially hidden off-screen */
-    box-shadow: none; /* Remove box-shadow */
-    border-right: none; /* Remove border-right */
-    transition: transform 0.3s ease-in-out; /* Smooth slide-in/out */
-    z-index: 1000; /* Ensure it's on top of other content */
+    width: 250px;
+    transform: translateX(-100%);
+    box-shadow: none;
+    border-right: none;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
 
-    // When `isSidebarCollapsed` is FALSE (meaning open/expanded on mobile)
     &:not(.sidebar-collapsed) {
-      transform: translateX(0); /* Slide in from left to be fully visible */
-      box-shadow: 2px 0 10px rgba(0,0,0,0.2); /* Add shadow for open state */
+      transform: translateX(0);
+      box-shadow: 2px 0 10px rgba(0,0,0,0.2);
     }
     
-    // On mobile, always show full sidebar (never collapsed state)
-    // Override collapsed styles for mobile
     &.sidebar-collapsed {
-      width: 250px; /* Full width even when "collapsed" on mobile */
-      transform: translateX(-100%); /* Hide it off-screen instead of collapsing */
+      width: 250px;
+      transform: translateX(-100%);
       
       .sidebar-item-text, 
       .sidebar-item-arrow,
       .logo-text {
-        display: block; /* Show all text on mobile */
+        display: block;
       }
       
       .sidebar-logo {
-        justify-content: flex-start; /* Align left on mobile */
+        justify-content: flex-start;
         mat-icon {
-          margin-right: 8px; /* Restore margin on mobile */
+          margin-right: 12px;
         }
       }
       
       .sidebar-item {
-        justify-content: flex-start; /* Align left on mobile */
+        justify-content: flex-start;
         mat-icon {
-          margin-right: 8px; /* Restore margin on mobile */
+          margin-right: 12px;
         }
       }
     }
     
     .sidebar-header {
-      padding: 15px; /* Adjust padding for mobile */
+      padding: 20px 16px;
     }
+    
     .sidebar-item {
-      padding: 10px 15px; /* Adjust padding for mobile */
-      font-size: 0.95rem; /* Slightly smaller font size */
-      margin-right: 0; /* No margin on right on full width mobile */
-      border-radius: 0; /* No rounded corners for full width on mobile */
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      margin-right: 0;
+      border-radius: 8px;
     }
+    
     .sidebar-submenu .sidebar-subitem {
-      padding-left: 30px; /* Adjust for mobile */
+      padding-left: 44px;
     }
   }
 }

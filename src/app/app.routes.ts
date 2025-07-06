@@ -33,7 +33,7 @@ export const routes: Routes = [
   {
     path: '',
     component: ApplicationsComponent,
-    // canActivate: [AuthGuard], // Protect all child routes within this parent
+    canActivate: [AuthGuard], // Protect all child routes within this parent
     children: [
       {
         path: 'dashboard',
