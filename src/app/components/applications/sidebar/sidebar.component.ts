@@ -30,13 +30,19 @@ export class SidebarComponent implements OnInit { // Implement OnInit
     {
       icon: 'home',
       label: 'Dashboard',
-      route: '/dashboard', // Example route
+      route: '/dashboard', 
       isOpen: false,
     },
     {
       icon: 'description',
       label: 'Resume Analyzer',
-      route: '/upload', // Example route
+      route: '/upload',
+      isOpen: false,
+    },
+    {
+      icon: 'analytics', 
+      label: 'Analytics',
+      route: '/analytics', 
       isOpen: false,
     },
     // {

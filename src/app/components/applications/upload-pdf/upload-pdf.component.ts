@@ -32,6 +32,26 @@ export class UploadPdfComponent {
 
   constructor(private http: HttpClient, private router: Router) {}
 
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+
+    this.http.get(`${environment.NODE_BASE_URL}/resume/analytics`, {
+          withCredentials: true,
+         }).subscribe({
+      next: (data: any) => {
+        
+        console.log("dashboard data:", data);
+        
+      },
+      error: (error) => {
+        console.error('Error loading dashboard data:', error);
+      }
+    });
+  }
+
   onFileDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;

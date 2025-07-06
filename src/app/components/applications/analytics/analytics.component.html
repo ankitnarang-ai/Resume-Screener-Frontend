@@ -1,0 +1,228 @@
+<div class="analytics-container">
+  <!-- Header -->
+  <div class="analytics-header">
+    <div class="header-content">
+      <h1>Analytics Dashboard</h1>
+      <p>Comprehensive insights into your recruitment performance</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="exportReport()">
+        <mat-icon aria-hidden="false" aria-label="download" fontIcon="download"></mat-icon>
+        Export Report
+      </button>
+      <button class="btn btn-primary" (click)="refreshData()">
+        <mat-icon aria-hidden="false" aria-label="refresh" fontIcon="refresh"></mat-icon>
+        Refresh Data
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading analytics data...</p>
+  </div>
+
+  <!-- Analytics Content -->
+  <div class="analytics-content" *ngIf="!isLoading">
+    <!-- Key Metrics Grid -->
+    <div class="metrics-grid">
+      <div class="metric-card primary" (click)="goToResume()">
+        <div class="metric-header">
+          <div class="metric-info">
+            <div class="metric-value">{{ totalResumesAnalyzed }}</div>
+            <div class="metric-label">Total Resumes</div>
+            <div class="metric-change positive">{{ totalResumesAnalyzed > 0 ? 'Active pipeline' : 'Ready to start' }}</div>
+          </div>
+          <div class="metric-icon">
+            <mat-icon aria-hidden="false" aria-label="description" fontIcon="description"></mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card success" (click)="goToCandidates()">
+        <div class="metric-header">
+          <div class="metric-info">
+            <div class="metric-value">{{ matchedCandidates }}</div>
+            <div class="metric-label">Qualified Candidates</div>
+            <div class="metric-change positive">{{ getMatchingRate() }}% match rate</div>
+          </div>
+          <div class="metric-icon">
+            <mat-icon aria-hidden="false" aria-label="task_alt" fontIcon="task_alt"></mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card info" (click)="goToInterviews()">
+        <div class="metric-header">
+          <div class="metric-info">
+            <div class="metric-value">{{ interviewInvitesSent }}</div>
+            <div class="metric-label">Interview Invitations</div>
+            <div class="metric-change neutral">{{ getInvitationRate() }}% of matches</div>
+          </div>
+          <div class="metric-icon">
+            <mat-icon aria-hidden="false" aria-label="calendar_today" fontIcon="calendar_today"></mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card warning">
+        <div class="metric-header">
+          <div class="metric-info">
+            <div class="metric-value">{{ getTotalInterviews() }}</div>
+            <div class="metric-label">Total Interviews</div>
+            <div class="metric-change positive">{{ getInterviewConversionRate() }}% conversion rate</div>
+          </div>
+          <div class="metric-icon">
+            <mat-icon aria-hidden="false" aria-label="insights" fontIcon="insights"></mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card ai" (click)="goToAIInterviews()">
+        <div class="metric-header">
+          <div class="metric-info">
+            <div class="metric-value">{{ aiInterviewsCompleted }}</div>
+            <div class="metric-label">AI Interviews</div>
+            <div class="metric-change neutral">{{ aiInterviewsCompleted > 0 ? 'Completed' : 'Ready to start' }}</div>
+          </div>
+          <div class="metric-icon">
+            <mat-icon aria-hidden="false" aria-label="auto_mode" fontIcon="auto_mode"></mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card human" (click)="goToHumanInterviews()">
+        <div class="metric-header">
+          <div class="metric-info">
+            <div class="metric-value">{{ humanInterviewsCompleted }}</div>
+            <div class="metric-label">Human Interviews</div>
+            <div class="metric-change neutral">{{ humanInterviewsCompleted > 0 ? 'Completed' : 'Pending AI screening' }}</div>
+          </div>
+          <div class="metric-icon">
+            <mat-icon aria-hidden="false" aria-label="person" fontIcon="person"></mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card danger" (click)="goToRejections()">
+        <div class="metric-header">
+          <div class="metric-info">
+            <div class="metric-value">{{ interviewRejections }}</div>
+            <div class="metric-label">Interview Rejections</div>
+            <div class="metric-change negative">{{ getRejectionRate() }}% rejection rate</div>
+          </div>
+          <div class="metric-icon">
+            <mat-icon aria-hidden="false" aria-label="close" fontIcon="close"></mat-icon>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card overall" (click)="goToJobPostings()">
+        <div class="metric-header">
+          <div class="metric-info">
+            <div class="metric-value">{{ getMatchingRate() }}%</div>
+            <div class="metric-label">Overall Match Rate</div>
+            <div class="metric-change positive">Quality matching</div>
+          </div>
+          <div class="metric-icon">
+            <mat-icon aria-hidden="false" aria-label="track_changes" fontIcon="track_changes"></mat-icon>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-section">
+      <div class="summary-card">
+        <div class="summary-header">
+          <h3>Performance Summary</h3>
+          <mat-icon aria-hidden="false" aria-label="analytics" fontIcon="analytics"></mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-stat">
+            <span class="stat-label">Total Applications Processed:</span>
+            <span class="stat-value">{{ totalResumesAnalyzed }}</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-label">Success Rate:</span>
+            <span class="stat-value">{{ getMatchingRate() }}%</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-label">Interview Completion:</span>
+            <span class="stat-value">{{ getInterviewConversionRate() }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-header">
+          <h3>Interview Breakdown</h3>
+          <mat-icon aria-hidden="false" aria-label="pie_chart" fontIcon="pie_chart"></mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-stat">
+            <span class="stat-label">AI Interviews:</span>
+            <span class="stat-value">{{ aiInterviewsCompleted }}</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-label">Human Interviews:</span>
+            <span class="stat-value">{{ humanInterviewsCompleted }}</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-label">Total Completed:</span>
+            <span class="stat-value">{{ getTotalInterviews() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-header">
+          <h3>Conversion Rates</h3>
+          <mat-icon aria-hidden="false" aria-label="trending_up" fontIcon="trending_up"></mat-icon>
+        </div>
+        <div class="summary-content">
+          <div class="summary-stat">
+            <span class="stat-label">Resume to Match:</span>
+            <span class="stat-value">{{ getMatchingRate() }}%</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-label">Match to Invitation:</span>
+            <span class="stat-value">{{ getInvitationRate() }}%</span>
+          </div>
+          <div class="summary-stat">
+            <span class="stat-label">Invitation to Interview:</span>
+            <span class="stat-value">{{ getInterviewConversionRate() }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications -->
+  <div class="toast-container" *ngIf="showSuccessToast || showErrorToast">
+    <div class="toast success" *ngIf="showSuccessToast">
+      <div class="toast-icon">
+        <mat-icon aria-hidden="false" aria-label="check_circle" fontIcon="check_circle"></mat-icon>
+      </div>
+      <div class="toast-content">
+        <p class="toast-message">{{ successMessage }}</p>
+      </div>
+      <button class="toast-close" (click)="hideSuccessToast()">
+        <mat-icon aria-hidden="false" aria-label="close" fontIcon="close"></mat-icon>
+      </button>
+    </div>
+
+    <div class="toast error" *ngIf="showErrorToast">
+      <div class="toast-icon">
+        <mat-icon aria-hidden="false" aria-label="error" fontIcon="error"></mat-icon>
+      </div>
+      <div class="toast-content">
+        <p class="toast-message">{{ errorMessage }}</p>
+      </div>
+      <button class="toast-close" (click)="hideErrorToast()">
+        <mat-icon aria-hidden="false" aria-label="close" fontIcon="close"></mat-icon>
+      </button>
+    </div>
+  </div>
+</div>
