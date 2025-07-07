@@ -36,14 +36,14 @@ export class AuthService {
 
   constructor(
     private httpClient: HttpClient
-  ) {}
+  ) { }
 
   get currentUserValue(): any {
     return this.currentUserSubject.value;
   }
 
   checkAuthStatus(): Observable<boolean> {
-    return this.httpClient.get<{ isAuthenticated: boolean; user?: any }>(`${environment.NODE_BASE_URL}/authentication/verify-token`, {withCredentials: true}).pipe(
+    return this.httpClient.get<{ isAuthenticated: boolean; user?: any }>(`${environment.NODE_BASE_URL}/authentication/verify-token`, { withCredentials: true }).pipe(
       map(response => {
         // Update user state if backend sends user data
         if (response.user) {
@@ -85,17 +85,16 @@ export class AuthService {
   // NEW: Google OAuth login method
   loginWithGoogle(googleIdToken: string): Observable<AuthResponse> {
     return this.httpClient.post<AuthResponse>(
-      `${environment.NODE_BASE_URL}/authentication/public/google`, 
-      { token: googleIdToken }, // Match your backend's expected format
+      `${environment.NODE_BASE_URL}/authentication/public/google-login`,
+      { token: googleIdToken },
       {
-        withCredentials: true, // Important: maintain cookie handling
+        withCredentials: true,
         headers: {
           'Content-Type': 'application/json'
         }
       }
     ).pipe(
       tap(response => {
-        // Update user state if backend sends user data
         if (response.user) {
           this.currentUserSubject.next(response.user);
         }
@@ -107,6 +106,32 @@ export class AuthService {
       })
     );
   }
+
+  signupWithGoogle(googleIdToken: string): Observable<AuthResponse> {
+    return this.httpClient.post<AuthResponse>(
+      `${environment.NODE_BASE_URL}/authentication/public/google-signup`,
+      { token: googleIdToken },
+      {
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    ).pipe(
+      tap(response => {
+        if (response.user) {
+          this.currentUserSubject.next(response.user);
+        }
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Google signup failed:', error);
+        this.currentUserSubject.next(null);
+        return throwError(() => error);
+      })
+    );
+  }
+
+
 
   updateUserRole(userId: string, role: string): Observable<any> {
 
