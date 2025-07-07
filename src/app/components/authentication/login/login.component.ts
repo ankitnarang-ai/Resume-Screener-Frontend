@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { PLATFORM_ID } from '@angular/core';
 import { AuthService } from '../../../services/auth/auth.service';
 import { CommonInputComponent } from '../../../shared/common-input/common-input.component';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -25,6 +26,7 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
+    private snackBar: MatSnackBar,
     private authService: AuthService,
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -44,6 +46,12 @@ export class LoginComponent {
       try {
         const { GoogleSignInComponent } = await import('../google-sign-in/google-sign-in.component');
         this.googleSignInComponentRef = this.googleSignInContainer.createComponent(GoogleSignInComponent);
+        this.googleSignInComponentRef.instance.loginError.subscribe((error: any) => {
+        this.snackBar.open(error, 'Close', {
+          duration: 5000,
+          panelClass: ['error-snackbar']
+        });
+      });
       } catch (error) {
         console.warn('Failed to load Google Sign-In component:', error);
       }

@@ -75,15 +75,6 @@ interface RoleOption {
                 <span>Continue</span>
                 }
               </button>
-
-              <button 
-                mat-button 
-                (click)="skipForNow()"
-                class="skip-btn"
-                [disabled]="isLoading"
-              >
-                Skip for now
-              </button>
             </div>
           </mat-card-content>
         </mat-card>
@@ -255,7 +246,7 @@ interface RoleOption {
   `]
 })
 export class RoleSelectionComponent implements OnInit {
-  selectedRole: string = '';
+  selectedRole: string = 'hr';
   isLoading = false;
   userId: string = '';
 
@@ -298,8 +289,6 @@ export class RoleSelectionComponent implements OnInit {
     if (!this.selectedRole) return;
 
     this.isLoading = true;
-
-    console.log("testing");
     
     // Call API to update user role
     this.authService.updateUserRole(this.userId, this.selectedRole).subscribe({
@@ -326,11 +315,6 @@ export class RoleSelectionComponent implements OnInit {
         });
       }
     });
-  }
-
-  skipForNow() {
-    // Navigate to login or dashboard without setting role
-    this.router.navigate(['/login']);
   }
 
   private navigateToDashboard() {

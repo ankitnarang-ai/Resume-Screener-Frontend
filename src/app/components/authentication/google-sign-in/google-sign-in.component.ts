@@ -29,13 +29,15 @@ export class GoogleSignInComponent implements OnInit {
   @Input() mode: 'login' | 'signup' = 'login';
   @Output() signupSuccess = new EventEmitter<any>();
   @Output() signupError = new EventEmitter<any>();
+  @Output() loginError = new EventEmitter<any>();
+
 
   constructor(
     private authService: AuthService,
     private router: Router,
     private ngZone: NgZone,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -72,7 +74,7 @@ export class GoogleSignInComponent implements OnInit {
           {
             theme: 'outline',
             size: 'large',
-            width: button.offsetWidth || 280, 
+            width: button.offsetWidth || 280,
             text: this.mode === 'signup' ? 'signup_with' : 'continue_with',
             shape: 'rectangle',
             type: 'standard',
@@ -107,12 +109,12 @@ export class GoogleSignInComponent implements OnInit {
   }
 
   private handleGoogleSignup(idToken: string): void {
-    this.authService.loginWithGoogle(idToken).subscribe({
+    this.authService.signupWithGoogle(idToken).subscribe({
       next: (authResponse) => {
         this.isLoading = false;
         this.successMessage = 'Google signup successful! Redirecting to role selection...';
         console.log("authresponse", authResponse);
-        
+
         this.signupSuccess.emit(authResponse);
         setTimeout(() => {
           this.router.navigate(['/role-selection'], {
@@ -130,6 +132,7 @@ export class GoogleSignInComponent implements OnInit {
     });
   }
 
+
   private handleGoogleLogin(idToken: string): void {
     this.authService.loginWithGoogle(idToken).subscribe({
       next: (authResponse) => {
@@ -142,7 +145,9 @@ export class GoogleSignInComponent implements OnInit {
       error: (error) => {
         this.isLoading = false;
         this.errorMessage = error.error?.message || 'Google login failed. Please try again.';
+        this.loginError.emit(this.errorMessage); // ✅ emit login error to parent
       }
     });
   }
+
 }
