@@ -16,12 +16,12 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [GuestGuard] // Prevent authenticated users from accessing login
+    canActivate: [GuestGuard]
   },
   {
     path: 'signup',
     component: SignupComponent,
-    canActivate: [GuestGuard] // Prevent authenticated users from accessing signup
+    canActivate: [GuestGuard]
   },
   {
     path: 'role-selection',
@@ -30,15 +30,14 @@ export const routes: Routes = [
   },
   
   // Protected Application Routes
-  // These routes require authentication and use the ApplicationsComponent as a layout
   {
     path: '',
     component: ApplicationsComponent,
-    canActivate: [AuthGuard], // Protect all child routes within this parent
+    canActivate: [AuthGuard],
     children: [
       {
         path: 'dashboard',
-        component: DashboardComponent,
+        component: DashboardComponent
       },
       {
         path: 'ai-interview',
@@ -46,7 +45,7 @@ export const routes: Routes = [
       },
       {
         path: 'upload',
-        component: UploadPdfComponent,
+        component: UploadPdfComponent
       },
       {
         path: 'chat',
@@ -61,15 +60,18 @@ export const routes: Routes = [
         loadComponent: () => import('./components/applications/analytics/analytics.component')
           .then(m => m.AnalyticsComponent)
       },
+      // Redirect empty path to dashboard
       {
-        path: '', // Default child route for '' (e.g., when navigating to just '/')
+        path: '',
         redirectTo: 'dashboard',
         pathMatch: 'full'
-      },
+      }
     ]
   },
 
-  // Redirect any unmatched paths to the dashboard (or login if not authenticated)
-  // This must be the last route in your configuration
-  { path: '**', redirectTo: '/dashboard' }
+  // Redirect any unmatched paths
+  { 
+    path: '**',
+    redirectTo: 'dashboard' // or 'login' depending on your preference
+  }
 ];

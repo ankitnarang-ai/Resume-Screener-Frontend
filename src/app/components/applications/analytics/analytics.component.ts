@@ -64,7 +64,6 @@ export class AnalyticsComponent implements OnInit {
     this.dashboardService.getAnalytics().subscribe({
       next: (response) => {
         this.ngZone.run(() => {
-          console.log("Analytics API response:", response)
           const data = response.data || response
 
           // Map API response properties
@@ -161,7 +160,6 @@ export class AnalyticsComponent implements OnInit {
 
   // Export functionality
   exportReport(): void {
-    console.log('Exporting analytics report')
     this.showSuccess('Report exported successfully!')
     // Implement actual export functionality
   }
