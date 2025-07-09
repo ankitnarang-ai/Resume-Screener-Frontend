@@ -43,13 +43,13 @@ export class AuthService {
   }
 
   checkAuthStatus(): Observable<boolean> {
-    return this.httpClient.get<{ isAuthenticated: boolean; user?: any }>(`${environment.NODE_BASE_URL}/authentication/verify-token`, { withCredentials: true }).pipe(
+    return this.httpClient.get<{ valid: boolean; user?: any }>(`${environment.NODE_BASE_URL}/authentication/verify-token`, { withCredentials: true }).pipe(
       map(response => {
         // Update user state if backend sends user data
         if (response.user) {
           this.currentUserSubject.next(response.user);
         }
-        return response.isAuthenticated || true;
+        return response.valid ;
       }),
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401 || error.status === 403) {
