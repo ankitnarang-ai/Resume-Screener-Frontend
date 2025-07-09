@@ -78,9 +78,9 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.getAnalytics().subscribe({
       next: (response) => {
         this.ngZone.run(() => {
-          console.log("Full API response:", response)
+        
           const data = response.data || response
-          console.log("Extracted data:", data)
+         
 
           // Map all the new API response properties
           this.totalResumesAnalyzed = data.resumeCount || 0
@@ -171,30 +171,25 @@ export class DashboardComponent implements OnInit {
 
   // ===== MISSING FUNCTIONS - Header Actions =====
   openSearch(): void {
-    console.log('Opening search functionality')
     // Implement search modal or navigate to search page
     this.showSuccess('Search functionality coming soon!')
   }
 
   openFilters(): void {
-    console.log('Opening filters')
     // Implement filter panel
     this.showSuccess('Filter panel coming soon!')
   }
 
   createNewJob(): void {
-    console.log('Creating new job')
     this.router.navigate(['/jobs/create'])
   }
 
   showNotifications(): void {
-    console.log('Showing notifications')
     this.showSuccess('You have 3 new notifications!')
   }
 
   // ===== MISSING FUNCTIONS - Workflow Steps =====
   goToStep(stepNumber: number): void {
-    console.log(`Navigating to step ${stepNumber}`)
     switch(stepNumber) {
       case 1:
         this.goToResume()
@@ -215,28 +210,23 @@ export class DashboardComponent implements OnInit {
 
   // ===== MISSING FUNCTIONS - Analytics Actions =====
   exportReport(): void {
-    console.log('Exporting analytics report')
     this.showSuccess('Report exported successfully!')
     // Implement actual export functionality
   }
 
   goToInterviewResults(): void {
-    console.log('Navigating to interview results')
     this.router.navigate(['/interviews/results'])
   }
 
   goToAIInterviews(): void {
-    console.log('Navigating to AI interviews')
     this.router.navigate(['/interviews/ai'])
   }
 
   goToHumanInterviews(): void {
-    console.log('Navigating to human interviews')
     this.router.navigate(['/interviews/human'])
   }
 
   goToRejections(): void {
-    console.log('Navigating to rejections')
     this.router.navigate(['/rejections'])
   }
 

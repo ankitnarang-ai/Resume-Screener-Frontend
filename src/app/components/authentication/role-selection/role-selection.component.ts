@@ -307,8 +307,6 @@ export class RoleSelectionComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading = false;
-         console.log("this.userId", this.userId);
-        console.log("this.selectedRole", this.selectedRole);
         this.snackBar.open('Failed to set role. Please try again.', 'Close', {
           duration: 5000,
           panelClass: ['error-snackbar']
