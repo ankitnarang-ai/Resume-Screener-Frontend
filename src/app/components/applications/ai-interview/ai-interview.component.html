@@ -1,1 +1,77 @@
-<p>ai-interview works!</p>
+<div class="ai-interview-container">
+  <!-- Main Interview Section -->
+  <div class="main-interview-section">
+    <h2>AI Voice Interview</h2>
+    <p class="subtitle">Professional AI-powered voice interview experience</p>
+
+    <!-- Human Interviewer Avatar -->
+    <div class="interviewer-avatar" [class.listening]="isListening">
+      <!-- Human emoji will be shown via CSS -->
+        <div class="avatar-icon">
+            <img src="https://res.cloudinary.com/dm2wxjddh/image/upload/v1752394338/robo-aiinterview_cjy3az.png" alt="Interviewer Avatar">
+        </div>
+    </div>
+
+    <!-- Interview Status -->
+    <div class="interviewer-status">
+      <div class="status-text">
+        {{ statusText }}
+      </div>
+    </div>
+
+    <!-- Voice Controls -->
+    <div class="voice-controls">
+      <button 
+        class="voice-btn start-voice-btn" 
+        *ngIf="!isListening"
+        (click)="startVoiceInterview()">
+         <mat-icon>mic</mat-icon>
+        Start Voice Interview
+      </button>
+      
+      <button 
+        class="voice-btn stop-voice-btn" 
+        *ngIf="isListening"
+        (click)="stopVoiceInterview()">
+        <mat-icon>stop</mat-icon>
+        Stop Interview
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Transcript Section -->
+  <div class="chat-transcript-section">
+    <div class="transcript-header">
+      <h3>
+       <mat-icon>chat</mat-icon>
+
+        Interview Transcript
+      </h3>
+    </div>
+
+    <div class="chat-messages" id="chatMessages">
+      <div 
+        class="message" 
+        [class.user]="message.type === 'user'"
+        [class.ai]="message.type === 'ai'"
+        *ngFor="let message of chatMessages">
+        <div>{{ message.message }}</div>
+        <div class="message-time">{{ message.timestamp | date:'shortTime' }}</div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="typing-indicator" *ngIf="isTyping">
+        <div class="typing-dots">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <span>AI is typing...</span>
+      </div>
+    </div>
+
+    <button class="clear-chat-btn" (click)="clearChat()">
+      Clear Transcript
+    </button>
+  </div>
+</div>

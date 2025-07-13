@@ -23,6 +23,7 @@ export class DashboardComponent implements OnInit {
   humanInterviewsCompleted = 0
   recentActivities: any[] = []
   isLoading = true
+  user: string | null = null
 
   // Additional properties for enhanced functionality
   showQuickActions = false
@@ -43,7 +44,8 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadDashboardData()
+    this.loadDashboardData();
+    this.getUserData();
   }
 
   loadDashboardData(): void {
@@ -60,6 +62,12 @@ export class DashboardComponent implements OnInit {
         this.router.navigate(["/login"])
       },
     })
+  }
+
+  getUserData(): void {
+    this.user = this.authService.currentUserValue?.firstName || null;
+    console.log(`Current user: ${this.user}`);
+    
   }
 
   private loadAnalytics(): void {
