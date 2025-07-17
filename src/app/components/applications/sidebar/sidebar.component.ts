@@ -36,6 +36,13 @@ export class SidebarComponent implements OnInit {
       isOpen: false,
     },
     {
+       icon: 'computer',
+      label: 'AI Interview',
+      route: '/ai-interview',
+      role: ['hr', 'candidate'],
+      isOpen: false,
+    },
+    {
       icon: 'description',
       label: 'Resume Analyzer',
       route: '/upload',
