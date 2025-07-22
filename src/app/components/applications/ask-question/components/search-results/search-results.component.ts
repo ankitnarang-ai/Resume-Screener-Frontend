@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../../../environment';
 import { Subscription } from 'rxjs';
+import { getJD } from '../../../../../store/job-description';
 
 @Component({
   selector: 'app-search-results',
@@ -19,26 +20,26 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   searchResults: any[] = [];
   lastSearchStats: string = '';
   isLoading: boolean = false;
-  
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private http: HttpClient,
     private searchResultsService: SearchResultsService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
-    
+
     // Subscribe to results
     this.subscriptions.add(
       this.searchResultsService.results$.subscribe(results => {
-        
+
         this.searchResults = results;
-        
+
         // Force change detection
         this.cdr.detectChanges();
-      
+
       })
     );
 
@@ -65,7 +66,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
 
   hasResults(): boolean {
     const hasResults = this.searchResults.length > 0;
-    
+
     return hasResults;
   }
 
@@ -83,17 +84,24 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   }
 
   inviteCandidate(candidate: any) {
-    
+
+    // get job description
+    const jd = getJD().trim();
+
     const candidateInfo = {
       candidateEmail: candidate.email,
       candidateName: candidate.name,
+      jobDescription: jd,
       interviewType: "ai"
     }
-    
+
+    if (!candidateInfo.candidateEmail || !candidateInfo.candidateName || !candidateInfo.jobDescription || !candidateInfo.interviewType)
+      return;
+
     this.http.post(`${environment.NODE_BASE_URL}/interview/invite`, candidateInfo, { withCredentials: true })
       .subscribe({
         next: (response: any) => {
-        
+
           this.searchResultsService.updateCandidateStatus(candidate.id, 'invited');
         },
         error: (error) => {
@@ -105,11 +113,11 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   rejectCandidate(candidate: any) {
     const candidateInfo = {
       hrId: "685843dc5af72037a2beb9d4",
-      candidateEmail: candidate.email ? candidate.email  : 'ankitnarang255@gmail.com',
+      candidateEmail: candidate.email ? candidate.email : 'ankitnarang255@gmail.com',
       candidateName: candidate.name,
       interviewType: "ai"
     }
-    
+
     this.http.post(`${environment.NODE_BASE_URL}/interview/reject`, candidateInfo, { withCredentials: true })
       .subscribe({
         next: (response: any) => {
