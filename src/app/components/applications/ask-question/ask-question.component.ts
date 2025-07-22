@@ -144,11 +144,12 @@ export class AskQuestionComponent {
 
   findMatches() {
     if (!this.canSearch() || this.isLoading) return;
-
-    setJD(this.jobDescription);
-    console.log("jd",getJD());
+    
     this.isLoading = true;
-
+    
+    // Set Job description in store to use in ai interview
+    setJD(this.jobDescription);
+    
     // Create search result with unique ID
     const searchResultId = this.generateId();
     const searchResult: SearchResult = {
