@@ -11,6 +11,7 @@ import { AiInterviewComponent } from './components/applications/ai-interview/ai-
 import { ApplicationsComponent } from './components/applications/applications.component';
 import { AnalyticsComponent } from './components/applications/analytics/analytics.component';
 import { InterviewsComponent } from './components/applications/interviews/interviews.component';
+import { RoleGuard } from './guard/role/role.guard';
 
 export const routes: Routes = [
   // Authentication Routes
@@ -38,6 +39,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
+        canActivate: [RoleGuard],
         component: DashboardComponent
       },
       
