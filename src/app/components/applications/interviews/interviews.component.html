@@ -1,0 +1,37 @@
+<div>
+    <h2>My Interviews</h2>
+    <p class="subtitle">
+        Below is a list of your upcoming and past interviews. Review the status, read the job description, and join your
+        scheduled sessions when you're ready.
+    </p>
+
+    @if (isLoading) {
+    <div class="loading-spinner">Fetching your interviews, please wait...</div>
+    }
+
+    @for (interview of interviews$ | async; track interview._id) {
+    <div class="interview-card">
+        <p><strong>Status:</strong> {{ interview.interviewDetails.status }}</p>
+        <p><strong>Job Description:</strong> {{ interview.interviewDetails.jobDescription }}</p>
+        <button (click)="goToInterview(interview._id, interview.interviewDetails.jobDescription)">
+            Go To Interview
+        </button>
+    </div>
+    } @empty {
+    <div class="no-interviews">
+        <p>No interviews found at the moment.</p>
+        <p>Once you're invited to an interview, it will appear here.</p>
+    </div>
+    }
+
+    @if(!isLoading && totalDocuments > 0) {
+    <div class="pagination-controls">
+        <div class="pagination-controls">
+            <mat-paginator [length]="totalDocuments" [pageIndex]="page - 1" [pageSize]="limit"
+                [pageSizeOptions]="[5, 10, 25, 100]" (page)="onPageChange($event)" aria-label="Select page">
+            </mat-paginator>
+        </div>
+
+    </div>
+    }
+</div>
