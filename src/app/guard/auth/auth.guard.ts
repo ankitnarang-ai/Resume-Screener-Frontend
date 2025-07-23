@@ -18,28 +18,31 @@ export class AuthGuard implements CanActivate {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> {
-    
-    
+    const token = route.queryParamMap.get('token');
+    const isAiInterviewRoute = state.url.startsWith('/interviews/ai-interview');
+
     return this.authService.checkAuthStatus().pipe(
       take(1),
       map(isAuthenticated => {
         if (isAuthenticated) {
           return true;
-        } else {
-          console.warn('AuthGuard: User not authenticated. Redirecting to login.');
-          return this.router.parseUrl('/login');
         }
+
+        // If unauthenticated but accessing ai-interview with a token, allow
+        if (isAiInterviewRoute && token) {
+          return true; // ✅ Allow access without storing token
+        }
+
+        // Otherwise redirect to login
+        return this.router.parseUrl('/login');
       }),
-      catchError(error => {
-        console.error('AuthGuard: Error during authentication check:', error);
-        return of(this.router.parseUrl('/login'));
-      })
+      catchError(() => of(this.router.parseUrl('/login')))
     );
   }
 }
