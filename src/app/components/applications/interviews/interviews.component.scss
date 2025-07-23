@@ -1,0 +1,153 @@
+// interviews.component.scss
+
+:host {
+  display: block;
+  padding: 2rem;
+  background: linear-gradient(to right, #e6f0ff, #f0f7ff); // subtle gradient
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  color: #2563eb; 
+  min-height: 100vh;
+}
+
+h2 {
+  color: #2563eb;; // dark navy blue
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+  color: #475569; // slate-600
+  text-align: center;
+}
+
+.no-interviews {
+  text-align: center;
+  font-size: 1rem;
+  color: #64748b; // slate-500
+  padding: 2rem 1rem;
+
+  p {
+    margin: 0.5rem 0;
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-bottom: 1rem;
+
+  ::ng-deep .mat-paginator {
+    color: #1e3a8a; // primary text color
+
+    .mat-paginator-range-label {
+      font-weight: 500;
+    }
+
+    .mat-paginator-icon {
+      color: #1e3a8a;
+    }
+
+    .mat-paginator-page-size {
+      .mat-select-trigger {
+        color: #1e3a8a;
+      }
+    }
+
+    .mat-select-arrow {
+      color: #1e3a8a;
+    }
+
+    .mat-paginator-page-size-label {
+      font-weight: 500;
+      color: #475569;
+    }
+
+    .mat-mdc-select {
+      background-color: #f0f7ff;
+      border-radius: 4px;
+    }
+  }
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  color: #1e3a8a;
+  font-weight: 500;
+}
+
+.interview-card {
+  background-color: #ffffff;
+  border: 1px solid #dbeafe; // soft blue border
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 10px rgba(30, 64, 175, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: fadeInUp 0.4s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(30, 64, 175, 0.15);
+  }
+
+  p {
+    margin: 0.25rem 0;
+    font-size: 1rem;
+    color: #1e293b; // dark gray-blue
+  }
+
+  button {
+    margin-top: 1rem;
+    background-color: #3b82f6; // primary blue
+    color: #ffffff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+
+    &:hover {
+      background-color: #2563eb; // deeper blue
+      transform: scale(1.02);
+    }
+
+    &:focus {
+      outline: 2px solid #93c5fd;
+      outline-offset: 2px;
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  :host {
+    padding: 1rem;
+  }
+
+  .interview-card {
+    padding: 1rem;
+  }
+
+  button {
+    width: 100%;
+  }
+}

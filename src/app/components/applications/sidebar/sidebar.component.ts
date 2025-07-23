@@ -32,7 +32,14 @@ export class SidebarComponent implements OnInit {
       icon: 'home',
       label: 'Dashboard',
       route: '/dashboard',
-      role: ['hr', 'candidate'],
+      role: ['hr'],
+      isOpen: false,
+    },
+    {
+      icon: 'computer',
+      label: 'Your Interviews',
+      route: '/interviews',
+      role: ['candidate'],
       isOpen: false,
     },
     {
@@ -49,7 +56,6 @@ export class SidebarComponent implements OnInit {
       role: ['hr'],
       isOpen: false,
     },
-    // Add more as needed...
   ];
 
   menuItems: MenuItem[] = [];
@@ -65,7 +71,7 @@ export class SidebarComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.filterMenuItemsByRole();
@@ -103,31 +109,31 @@ export class SidebarComponent implements OnInit {
 
   setActiveItemFromRoute() {
     const currentUrl = this.router.url;
-    let found = false;
+    let matchedItem: MenuItem | null = null;
 
     for (const item of this.menuItems) {
-      if (item.route === currentUrl) {
-        this.activeItem = item;
+      // Exact match or subpath match (e.g., /interviews or /interviews/ai-interview)
+      if (item.route && currentUrl.startsWith(item.route)) {
+        matchedItem = item;
         item.isOpen = true;
-        found = true;
         break;
       }
+
+      // If the item has children
       if (item.children) {
         for (const child of item.children) {
-          if (child.route === currentUrl) {
-            this.activeItem = child;
+          if (child.route && currentUrl.startsWith(child.route)) {
+            matchedItem = child;
             item.isOpen = true;
-            found = true;
             break;
           }
         }
       }
-      if (found) break;
+
+      if (matchedItem) break;
     }
 
-    if (!found) {
-      this.activeItem = null;
-    }
+    this.activeItem = matchedItem;
   }
 
   toggleSidebar() {

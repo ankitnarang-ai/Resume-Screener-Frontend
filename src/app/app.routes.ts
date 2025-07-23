@@ -10,6 +10,8 @@ import { AuthGuard } from './guard/auth/auth.guard';
 import { AiInterviewComponent } from './components/applications/ai-interview/ai-interview.component';
 import { ApplicationsComponent } from './components/applications/applications.component';
 import { AnalyticsComponent } from './components/applications/analytics/analytics.component';
+import { InterviewsComponent } from './components/applications/interviews/interviews.component';
+import { RoleGuard } from './guard/role/role.guard';
 
 export const routes: Routes = [
   // Authentication Routes
@@ -28,7 +30,7 @@ export const routes: Routes = [
     loadComponent: () => import('./components/authentication/role-selection/role-selection.component')
       .then(m => m.RoleSelectionComponent)
   },
-  
+
   // Protected Application Routes
   {
     path: '',
@@ -37,10 +39,17 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
+        canActivate: [RoleGuard],
         component: DashboardComponent
       },
+      
       {
-        path: 'ai-interview',
+        path: 'interviews',
+        component: InterviewsComponent,
+
+      },
+      {
+        path: 'interviews/ai-interview/:id',
         component: AiInterviewComponent
       },
       {
@@ -70,7 +79,7 @@ export const routes: Routes = [
   },
 
   // Redirect any unmatched paths
-  { 
+  {
     path: '**',
     redirectTo: 'dashboard' // or 'login' depending on your preference
   }

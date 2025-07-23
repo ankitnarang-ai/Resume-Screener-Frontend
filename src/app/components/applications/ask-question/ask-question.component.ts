@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { environment } from '../../../../../environment';
 import { SearchResultsService } from '../../../services/search-result/search-results.service';
+import { getJD, setJD } from '../../../store/job-description';
 
 interface JobTemplate {
   id: string;
@@ -43,7 +44,7 @@ interface Candidate {
 })
 export class AskQuestionComponent {
   @ViewChild('jobDescriptionInput') jobDescriptionInput!: ElementRef<HTMLTextAreaElement>;
-  
+
   jobDescription = '';
   matchType: 'strong' | 'moderate' = 'moderate';
   isLoading = false;
@@ -111,7 +112,7 @@ export class AskQuestionComponent {
     private http: HttpClient,
     private router: Router,
     private searchResultsService: SearchResultsService
-  ) {}
+  ) { }
 
   canSearch(): boolean {
     return this.jobDescription.trim().length >= 20;
@@ -143,8 +144,11 @@ export class AskQuestionComponent {
 
   findMatches() {
     if (!this.canSearch() || this.isLoading) return;
-
+    
     this.isLoading = true;
+    
+    // Set Job description in store to use in ai interview
+    setJD(this.jobDescription);
     
     // Create search result with unique ID
     const searchResultId = this.generateId();
@@ -158,10 +162,10 @@ export class AskQuestionComponent {
 
     // Set loading state in service
     this.searchResultsService.setLoading(true);
-    
+
     // Add empty result to service first
     this.searchResultsService.addResult(searchResult);
-    
+
     // Navigate to results page
     this.router.navigate(['/results']);
 
@@ -174,28 +178,28 @@ export class AskQuestionComponent {
     })
       .subscribe({
         next: (response: any) => {
-          
+
           const candidates = this.parseResponse(response.answer);
-          
+
           // Update the specific search result with candidates
           const updatedResult: SearchResult = {
             ...searchResult,
             candidates: candidates
           };
-          
+
           // Update the result in the service
           this.searchResultsService.updateResult(updatedResult);
           this.searchResultsService.setStats(`${candidates.length} candidates analyzed`);
         },
         error: (error) => {
           console.error('Search error:', error);
-          
+
           // Update with empty candidates on error
           const errorResult: SearchResult = {
             ...searchResult,
             candidates: []
           };
-          
+
           this.searchResultsService.updateResult(errorResult);
           this.searchResultsService.setStats('Search failed - please try again');
         },
@@ -207,115 +211,115 @@ export class AskQuestionComponent {
   }
 
   private parseResponse(answer: any): Candidate[] {
-  const candidates: Candidate[] = [];
-  
-  try {
-    // Handle the new JSON response format
-    if (answer && answer.matches && Array.isArray(answer.matches)) {
-      answer.matches.forEach((match: any) => {
-        if (match.name) {
-          const candidate: Candidate = {
-            id: this.generateId(),
-            name: match.name,
-            filename: match.filename, // Default filename since it's not provided in the new format
-            email: match.email || '',
-            matchType: this.matchType, // Use the selected match type from the form
-            status: 'pending'
-          };
-          
-          candidates.push(candidate);
-        }
-      });
-    }
-    
-    // Fallback: Handle legacy text-based response format if needed
-    else if (typeof answer === 'string') {
-      // Keep the existing text parsing logic as fallback
-      const lines = answer.split('\n').filter(line => line.trim());
-      
-      lines.forEach((line, index) => {
-        const trimmedLine = line.trim();
-        
-        // Check for different possible formats
-        let isMatch = false;
-        let matchType: 'strong' | 'moderate' = 'moderate';
-        let content = '';
-        
-        if (trimmedLine.startsWith('- Strong Match:')) {
-          isMatch = true;
-          matchType = 'strong';
-          content = trimmedLine.replace(/^- Strong Match:\s*/, '');
-        } else if (trimmedLine.startsWith('- Moderate Match:')) {
-          isMatch = true;
-          matchType = 'moderate';
-          content = trimmedLine.replace(/^- Moderate Match:\s*/, '');
-        } else if (trimmedLine.startsWith('Strong Match:')) {
-          isMatch = true;
-          matchType = 'strong';
-          content = trimmedLine.replace(/^Strong Match:\s*/, '');
-        } else if (trimmedLine.startsWith('Moderate Match:')) {
-          isMatch = true;
-          matchType = 'moderate';
-          content = trimmedLine.replace(/^Moderate Match:\s*/, '');
-        } else if (trimmedLine.includes('|') && (trimmedLine.includes('.pdf') || trimmedLine.includes('.doc'))) {
-          // Fallback: if line contains pipe and file extension, assume it's a candidate
-          isMatch = true;
-          matchType = 'moderate'; // default
-          content = trimmedLine;
-        }
-        
-        if (isMatch && content) {
-          // Split by pipe or other delimiters
-          let parts = content.split('|').map(p => p.trim());
-          
-          // If no pipe, try other delimiters
-          if (parts.length === 1) {
-            parts = content.split('-').map(p => p.trim());
+    const candidates: Candidate[] = [];
+
+    try {
+      // Handle the new JSON response format
+      if (answer && answer.matches && Array.isArray(answer.matches)) {
+        answer.matches.forEach((match: any) => {
+          if (match.name) {
+            const candidate: Candidate = {
+              id: this.generateId(),
+              name: match.name,
+              filename: match.filename, // Default filename since it's not provided in the new format
+              email: match.email || '',
+              matchType: this.matchType, // Use the selected match type from the form
+              status: 'pending'
+            };
+
+            candidates.push(candidate);
           }
-          if (parts.length === 1) {
-            parts = content.split(',').map(p => p.trim());
+        });
+      }
+
+      // Fallback: Handle legacy text-based response format if needed
+      else if (typeof answer === 'string') {
+        // Keep the existing text parsing logic as fallback
+        const lines = answer.split('\n').filter(line => line.trim());
+
+        lines.forEach((line, index) => {
+          const trimmedLine = line.trim();
+
+          // Check for different possible formats
+          let isMatch = false;
+          let matchType: 'strong' | 'moderate' = 'moderate';
+          let content = '';
+
+          if (trimmedLine.startsWith('- Strong Match:')) {
+            isMatch = true;
+            matchType = 'strong';
+            content = trimmedLine.replace(/^- Strong Match:\s*/, '');
+          } else if (trimmedLine.startsWith('- Moderate Match:')) {
+            isMatch = true;
+            matchType = 'moderate';
+            content = trimmedLine.replace(/^- Moderate Match:\s*/, '');
+          } else if (trimmedLine.startsWith('Strong Match:')) {
+            isMatch = true;
+            matchType = 'strong';
+            content = trimmedLine.replace(/^Strong Match:\s*/, '');
+          } else if (trimmedLine.startsWith('Moderate Match:')) {
+            isMatch = true;
+            matchType = 'moderate';
+            content = trimmedLine.replace(/^Moderate Match:\s*/, '');
+          } else if (trimmedLine.includes('|') && (trimmedLine.includes('.pdf') || trimmedLine.includes('.doc'))) {
+            // Fallback: if line contains pipe and file extension, assume it's a candidate
+            isMatch = true;
+            matchType = 'moderate'; // default
+            content = trimmedLine;
           }
-          
-          if (parts.length >= 2) {
-            const name = parts[0].trim();
-            const filename = parts[1].trim();
-            const email = parts[2]?.trim() || '';
-            
-            if (name && filename) {
+
+          if (isMatch && content) {
+            // Split by pipe or other delimiters
+            let parts = content.split('|').map(p => p.trim());
+
+            // If no pipe, try other delimiters
+            if (parts.length === 1) {
+              parts = content.split('-').map(p => p.trim());
+            }
+            if (parts.length === 1) {
+              parts = content.split(',').map(p => p.trim());
+            }
+
+            if (parts.length >= 2) {
+              const name = parts[0].trim();
+              const filename = parts[1].trim();
+              const email = parts[2]?.trim() || '';
+
+              if (name && filename) {
+                const candidate: Candidate = {
+                  id: this.generateId(),
+                  name,
+                  filename,
+                  email,
+                  matchType,
+                  status: 'pending'
+                };
+
+                candidates.push(candidate);
+              }
+            } else if (parts.length === 1 && parts[0]) {
+              // Single part - assume it's name, create dummy filename
               const candidate: Candidate = {
                 id: this.generateId(),
-                name,
-                filename,
-                email,
+                name: parts[0],
+                filename: 'resume.pdf',
+                email: '',
                 matchType,
                 status: 'pending'
               };
-              
+
               candidates.push(candidate);
             }
-          } else if (parts.length === 1 && parts[0]) {
-            // Single part - assume it's name, create dummy filename
-            const candidate: Candidate = {
-              id: this.generateId(),
-              name: parts[0],
-              filename: 'resume.pdf',
-              email: '',
-              matchType,
-              status: 'pending'
-            };
-            
-            candidates.push(candidate);
           }
-        }
-      });
+        });
+      }
+
+    } catch (error) {
+      console.error('Error parsing response:', error);
     }
-    
-  } catch (error) {
-    console.error('Error parsing response:', error);
+
+    return candidates;
   }
-  
-  return candidates;
-}
 
   private focusTextarea() {
     setTimeout(() => {

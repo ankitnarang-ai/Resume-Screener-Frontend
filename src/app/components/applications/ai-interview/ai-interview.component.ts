@@ -6,6 +6,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { environment } from '../../../../../environment';
+import { ActivatedRoute, Route, Router } from '@angular/router';
+import { AuthService } from '../../../services/auth/auth.service';
 
 interface ChatMessage {
   type: 'user' | 'ai';
@@ -31,6 +33,7 @@ export class AiInterviewComponent implements OnInit, OnDestroy {
   
   private socketSub?: Subscription;
   private recognition?: any;
+  userDetails: any = '';
 
   chatMessages: ChatMessage[] = [
     {
@@ -46,10 +49,37 @@ export class AiInterviewComponent implements OnInit, OnDestroy {
     private websocketService: WebSocketService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
+    private activateRoute: ActivatedRoute,
+    private authService: AuthService,
+    private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
+
+    const token = this.activateRoute.snapshot.queryParamMap.get('token');
+
+    if(token) {
+      this.userDetails = this.authService.checkAuthStatus().subscribe({
+        next: (res) => {
+          console.log("user authenticated", res)
+        },
+        error: (err) => {
+          console.error("error: ", err)
+        }
+      })
+    }
+
+    // Check if current role is hr than don't allow
+    const currentUser = this.authService.currentUserValue;
+
+    if(currentUser.role === 'hr') {
+      this.router.navigate(['/'])
+      throw new Error("Hr are not allowed to access this page")
+    }
+
+    console.log("user dateaidls", currentUser);
+
     if (isPlatformBrowser(this.platformId)) {
       this.socketConnect();
   
